@@ -80,7 +80,7 @@ sugethw key=sx,gx <dado.su
 sugethw key=sx,gx <dado2.su
 ```
 
-**6.** A sísmica de reflexão é sensível a contrastes na densidade e no módulo de Bulk do meio, que por sua vez determinam a **velocidade de propagação** das ondas sísmicas.
+**6.** A sísmica de reflexão é sensível a contrastes na densidade e no módulo de Bulk do meio, que por sua vez determinam a *velocidade de propagação* das ondas sísmicas.
 
 **7.** 
 
@@ -116,12 +116,12 @@ Como são valores aproximados, podemos considerar que os resultados obtidos expe
 
 **9.** Se dois sinais discretos e finitos têm m e n amostras, a convolução entre eles terá $m+n-1$ amostras
 
-> Ver implementação em Python no arquivo [convolucao.py](./convolucao.py)
+> Ver implementação em Python no arquivo [convolucao](./convolucao.ipynb)
 
 **10.** 
 
-> Ver implementação em Python no arquivo [convolucao2.py](./convolucao2.py)
+> Ver implementação em Python no arquivo [convolucao2](./convolucao2.ipynb)
 
 **11.** *work in progress*
 
-**12.** 
+**12.** *work in progress*
