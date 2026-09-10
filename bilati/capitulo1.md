@@ -112,9 +112,16 @@ $$
 
 Como são valores aproximados, podemos considerar que os resultados obtidos experimentalmente estão de acordo com os resultados analíticos.
 
-**8.** *work in progress*
+**8.** Vamos observar a interferência de entre pulsos refletidos por refletores gradativamente mais próximos
 
 **9.** Se dois sinais discretos e finitos têm m e n amostras, a convolução entre eles terá $m+n-1$ amostras
 
 > Ver implementação em Python no arquivo [convolucao.py](./convolucao.py)
 
+**10.** 
+
+> Ver implementação em Python no arquivo [convolucao2.py](./convolucao2.py)
+
+**11.** *work in progress*
+
+**12.** 
