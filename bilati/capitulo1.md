@@ -90,7 +90,17 @@ suwaveform type=ricker1 fpeak=15 | suxgraph style=normal
 
 ![Questão 6](./wave-fpeak15.png)
 
-Pela figura, $T_D \approx 0.06$ e $T_R \approx 0.04$. Analiticamente, para $f_p = 15$ Hz temos:
+Pela figura, 
+
+$$
+T_D \approx [0.03 - (-0.03)] = 0.06
+$$
+
+$$
+T_R \approx [0.02 - (-0.02)] = 0.04
+$$
+
+Analiticamente, para $f_p = 15$ Hz temos:
 
 $$
 T_D = \frac{\sqrt{6}}{\pi f_p} = \frac{\sqrt{6}}{\pi \cdot 15} = 0.05 
@@ -99,6 +109,8 @@ $$
 $$
 T_R = \frac{\sqrt{2}}{\pi f_p} = \frac{\sqrt{2}}{\pi \cdot 15} = 0.03
 $$
+
+Como são valores aproximados, podemos considerar que os resultados obtidos experimentalmente estão de acordo com os resultados analíticos.
 
 **8.** *work in progress*
 
