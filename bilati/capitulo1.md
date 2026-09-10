@@ -99,3 +99,5 @@ $$
 $$
 T_R = \frac{\sqrt{2}}{\pi f_p} = \frac{\sqrt{2}}{\pi \cdot 15} = 0.03
 $$
+
+**8.** Se dois sinais discretos e finitos têm m e n amostras, a convolução entre eles terá $m+n-1$ amostras
