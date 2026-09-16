@@ -124,4 +124,42 @@ Como são valores aproximados, podemos considerar que os resultados obtidos expe
 
 **11.** *work in progress*
 
-**12.** *work in progress*
+**12.** A estrutura de um dado sísmico no formato SU é composta por $1..N$ traços, cada um contendo um cabeçalho de 240 bytes e um dado binário de 4 bytes por amostra registrada
+
+```md
++-----------------------+-----------------------+-----+-----------------------+
+|       TRAÇO 1         |       TRAÇO 2         | ... |        TRAÇO N        |
++-----------------------+-----------------------+-----+-----------------------+
+| [Header] | [Amostras] | [Header] | [Amostras] | ... | [Header] | [Amostras] |
++-----------------------+-----------------------+-----+-----------------------+
+```
+
+Abaixo a estrutura detalhada de um traço, mostrando o cabeçalho e os dados binários de amostras.
+
+
+```md
++----------------------------------------------+-----------------------------------------------+
+|          CABEÇALHO DO TRAÇO (HEADER)         |           DADOS BINÁRIOS (SAMPLES)            |
+|                  240 bytes                   |            N x 4 bytes (Float32)              |
++----------------------------------------------+-----------------------------------------------+
+|  Campos de metadados:                        | Amostra 1  : 4 bytes  [ Float 32-bit IEEE ]   |
+|   - tracl, tracr (Nº do traço)               | Amostra 2  : 4 bytes  [ Float 32-bit IEEE ]   |
+|   - fldr         (Nº do tiro)                | Amostra 3  : 4 bytes  [ Float 32-bit IEEE ]   |
+|   - sx, sy       (Coordenadas da Fonte)      | ...                                           |
+|   - gx, gy       (Coordenadas do Receptor)   | Amostra N-1: 4 bytes  [ Float 32-bit IEEE ]   |
+|   - ns           (Número de amostras = N)    | Amostra N  : 4 bytes  [ Float 32-bit IEEE ]   |
+|   - dt           (Intervalo de amostragem)   |                                               |
+|   - ... (outros parâmetros do modelo)        |                                               |
++----------------------------------------------+-----------------------------------------------+
+```
+
+Então, considerando que o dado sísmico produzido possui
+
+- 120 *samples* (ns = 120)
+- 1000 *traces* (tracl = tracr = 1..1000)
+
+O tamanho total do arquivo SU pode ser calculado da seguinte forma:
+
+- Cabeçalhos: 1000 traços x 240 bytes = 240.000 bytes
+- Dados binários: 1000 traços x 120 amostras x 4 bytes = 480.000 bytes
+- Tamanho total do arquivo SU = 240.000 bytes + 480.000 bytes = 720.000 bytes = 720 KB
