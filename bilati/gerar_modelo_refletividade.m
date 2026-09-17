@@ -1,8 +1,8 @@
-function [samples, r_serie, a_serie, dt_acumulado] = gerar_modelo_refletividade(z, v, dt_amostra)
+function [samples, r_serie, a_serie, esp_acumulado] = gerar_modelo_refletividade(z, v, dt_amostra)
     % Espessuras e tempos de viagem de ida e volta por camada
     dz = diff([0; z(:)]);
-    dt = (2 * dz) ./ v(:);
-    dt_acumulado = cumsum(dt);
+    esp = (2 * dz) ./ v(:);
+    esp_acumulado = cumsum(esp);
     
     % Cálculo dos coeficientes de reflexão nas interfaces
     nr = length(v) - 1;
@@ -17,14 +17,14 @@ function [samples, r_serie, a_serie, dt_acumulado] = gerar_modelo_refletividade(
     a(2:end) = r(2:end) .* perda_acumulada(1:end-1);
     
     % Mapeamento nos eixos de amostragem no tempo
-    t_max = ceil(dt_acumulado(end));
+    t_max = ceil(esp_acumulado(end));
     samples = 0 : dt_amostra : t_max;
     
     r_serie = zeros(size(samples));
     a_serie = zeros(size(samples));
     
     for k = 1:nr
-        [~, idx] = min(abs(samples - dt_acumulado(k)));
+        [~, idx] = min(abs(samples - esp_acumulado(k)));
         r_serie(idx) = r(k);
         a_serie(idx) = a(k);
     end
