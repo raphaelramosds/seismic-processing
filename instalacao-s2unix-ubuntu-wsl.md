@@ -8,9 +8,125 @@ sudo apt update && sudo apt install -y xorg gcc make libx11-dev libxt-dev libxex
 
 Siga o tutorial de: https://wiki.seismic-unix.org/sudoc:su_installation
 
-## Makefile.config
+## Makefile.config (little-endian)
 
-Use esse Makefile.config
+Caso little-endian, use esse Makefile.config
+
+```Makefile
+#=======================================================================
+#                 Makefile.config for Gnu/Linux 
+#=======================================================================
+#-----------------------------------------------------------------------
+# pick up the Make rules (Gnu make required)
+#-----------------------------------------------------------------------
+
+include $(CWPROOT)/src/Rules/gnumake.rules
+include $(CWPROOT)/src/Rules/abbrev.rules
+include $(CWPROOT)/src/Rules/cflags.rules
+include $(CWPROOT)/src/Rules/suffix.rules
+include $(CWPROOT)/src/Rules/misc.rules
+include $(CWPROOT)/src/Rules/opengl.rules
+
+#-----------------------------------------------------------------------
+#                     CWP feature options
+#-----------------------------------------------------------------------
+#
+# LINEHDRFLAG=SU_LINEHEADER  - adds 3200 byte text & 400 byte SEG-Y 
+#                              style line headers to output. CWP/SU
+#                              always reads either format unless SUXDR
+#                              has been selected.
+#
+# XDRFLAG=-DSUXDR            - forces all SU data to be big endian
+#                              independent of processor architecture
+#
+# LARGE_FILE_FLAG            - controls access to files > 2 GB on
+#                              some systems.
+#
+# -DSLTSU_SEGY_H             - if defined selects SLT/SU trace header
+#                              layout so both packages are compatible
+#-----------------------------------------------------------------------
+
+LINEHDRFLAG = 
+
+# NO-XDR configurado abaixo (XDRFLAG e XDRLFLAGS vazios)
+XDRFLAG = 
+XDRLFLAGS = 
+
+# Most systems are LITTLE_ENDIAN these days
+ENDIANFLAG = -DCWP_LITTLE_ENDIAN
+LARGE_FILE_FLAG = -D_FILE_OFFSET_BITS=64 -D_LARGEFILE64_SOURCE
+
+CWP_FLAGS = $(LARGE_FILE_FLAG) $(ENDIANFLAG) $(XDRFLAG) $(LINEHDRFLAG)
+
+#-----------------------------------------------------------------------
+# system stuff
+#-----------------------------------------------------------------------
+
+SHELL = /bin/sh
+ROOT = $(CWPROOT)
+
+LN = ln # this needs to be changed to cp for FAT32 filesystems
+AR = ar
+ARFLAGS = rv
+RANLIB = ranlib
+RANFLAGS = 
+ICHMODLINE = chmod 644 $@
+MCHMODLINE = chmod 755 $@
+
+POSTLFLAGS = 
+
+#-----------------------------------------------------------------------
+# use both X11 path conventions
+#-----------------------------------------------------------------------
+
+IX11 = /usr/X11/include
+LX11 = /usr/X11/lib
+IMOTIF = /usr/X11R6/include
+LMOTIF = /usr/X11R6/lib
+
+LD_LIBRARY_PATH += $(CWPROOT)/lib:${LX11}:${LMOTIF}
+
+#-----------------------------------------------------------------------
+# Sun/Oracle compilers  comment out the Gnu compiler section to use
+#-----------------------------------------------------------------------
+
+CPP = cpp
+
+CC = cc
+#OPTC = -g -Xc  -xc99 
+OPTC = -O -Xc  -xc99 
+CFLAGS = -I$I $(OPTC) $(CWP_FLAGS) -D_BSD_SOURCE -D_POSIX_SOURCE
+
+FC = f90 -f77
+OPTF = -g
+FFLAGS =
+
+C++FLAGS = -I$I $(OPTC) $(CWP_FLAGS)
+
+#-----------------------------------------------------------------------
+# Gnu compilers by default just because they are the most common
+#-----------------------------------------------------------------------
+
+CPP = cpp
+
+#CC = clang
+CC = gcc
+#OPTC = -g  -std=c99 -Wall -pedantic -Wno-long-long 
+#OPTC = -O  -std=c99 -Wall -pedantic -Wno-long-long 
+OPTC = -O2 -std=gnu89 -w -Wno-error=incompatible-pointer-types
+#CFLAGS = -I$I $(OPTC) $(CWP_FLAGS) -D_BSD_SOURCE -D_POSIX_SOURCE
+CFLAGS = -I$I $(OPTC) $(CWP_FLAGS) -D_DEFAULT_SOURCE -D_XOPEN_SOURCE=700
+
+FC = gfortran
+FOPTS = -g 
+FFLAGS = $(FOPTS) -ffixed-line-length-none
+
+C++FLAGS = -I$I $(OPTC) $(CWP_FLAGS)
+```
+
+## Makefile.config (big-endian)
+
+Caso big-endian, use esse Makefile.config
 
 ```Makefile
 #=======================================================================
@@ -135,7 +251,6 @@ FOPTS = -g
 FFLAGS = $(FOPTS) -ffixed-line-length-none
 
 C++FLAGS = -I$I $(OPTC) $(CWP_FLAGS)
-
 ```
 
 ## Compilar
