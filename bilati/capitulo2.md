@@ -116,3 +116,8 @@ susynlv nt=501 dt=0.004 nxs=1 fxs=0 dxs=0 fxo=-4.0 dxo=0.05 nxo=161 fpeak=20 ref
 <img src="./c2-q2-common-shot.jpg" width="300"/>
 
 Essa seção é chamada de *common-shot* (tiro comum), pois temos apenas um tiro, e todos os receptores estão localizados em torno da posição do tiro.
+
+**Questão 3**
+
+**(a)**
+
