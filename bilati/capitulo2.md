@@ -121,3 +121,6 @@ Essa seção é chamada de *common-shot* (tiro comum), pois temos apenas um tiro
 
 **(a)**
 
+O modelo de velocidades gerado para essa questão foi gerado em [modelo_velocidades_2d.m](./modelo_velocidades_2d.m)
+
+<img src="./velocidades.jpg" width="300"/>
