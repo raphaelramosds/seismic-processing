@@ -1,0 +1,9 @@
+0. instale o image magick
+
+sudo apt install imagemagick-7.q16
+
+1. aperte P na saida do suximage
+
+2. chame o convet do image magick
+
+convert -density 300 plotfile.ps c2-b-posicoes.jpg
