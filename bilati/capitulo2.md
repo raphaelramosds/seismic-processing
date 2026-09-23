@@ -46,11 +46,15 @@ Os valores padrão dos parâmetros que ajustam a escala do eixo horizontal (dime
 
 Pelo comando susynlv, são 101 tiros para serem apresentados no eixo horizontal. Então, faz sentido que, com `d2 = 1.0`, o eixo horizontal vá de 0 a 101, que é o número do tiro.
 
-$(101 \text{ tiros}) \cdot 1.0 = 101$
+$$
+(101 \text{ tiros}) \cdot 1.0 = 101
+$$
 
 Esse modelo é *zero-offset* então o ponto médio de cada tiro é a própria posição do tiro, em que fonte $x_s$ e receptor $x_g$ estão no mesmo ponto. Assim, para que cada tiro coincida com seu ponto médio, precisamos ajustar o parâmetro `d2` para 0.05, que é o espaçamento entre os tiros. Assim, o eixo horizontal representará a posição do tiro.
 
-$(101 \text{ tiros}) \cdot 0.05 = 5.05 \text{ km}$
+$$
+(101 \text{ tiros}) \cdot 0.05 = 5.05 \text{ km}
+$$
 
 ```bash
 suximage f2=0.0 d2=0.05 label2="Ponto Medio (km)" label1="Tempo (s)" <exemplo.su perc=99
@@ -88,4 +92,27 @@ sx=150          gx=650      offset=500
 sx=200          gx=700      offset=500
 ```
 
-Observe que as fontes estão a cada 50m, e os receptores estão sempre a 500m de distância da fonte, ou seja, o afastamento é constante em 500m.
+Observe que a fonte se move a cada tiro: quando ela está em 0, o receptor está em 500, quando a fonte está em 50, o receptor está em 550, e assim por diante. O afastamento entre a fonte e o receptor é sempre de 500m.
+
+**Questão 2**
+
+Simulação de uma seção com as características abaixo
+
+- Tiro comum (nxs = 1)
+- Modelo com um refletor plano inclinado, com mergulho de 30 graus
+- Afastamentos de -4km a 4km
+- A profundade mínima do refletor deve ser de 500m (0.5 km)
+
+Considerando que temos um receptor a cada dxs = 0.05 km, o número de receptores será
+
+$$
+\text{nxo} = \frac{4 - (-4)}{0.05} + 1 = 161
+$$
+
+```bash
+susynlv nt=501 dt=0.004 nxs=1 fxs=0 dxs=0 fxo=-4.0 dxo=0.05 nxo=161 fpeak=20 ref="1:-5,0.5;5,3.38" | suximage label1="Tempo (s)" label2="Offset (km)" perc=99
+```
+
+<img src="./c2-q2-common-shot.jpg" width="300"/>
+
+Essa seção é chamada de *common-shot* (tiro comum), pois temos apenas um tiro, e todos os receptores estão localizados em torno da posição do tiro.
