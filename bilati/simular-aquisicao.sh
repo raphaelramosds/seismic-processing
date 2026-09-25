@@ -19,13 +19,13 @@ mt=10 pml=1 pml_thick=20
 
 echo "iniciando a simulacao por diferenças finitas..."
 
-sufdmod2_pml <vel.out nz=$n1 dz=$d1 nx=$n2 dx=$d2 \
+sufdmod2_pml <vel-difrator.out nz=$n1 dz=$d1 nx=$n2 dx=$d2 \
     xs=$xs zs=$zs hsz=$hsz vsx=$vsx hsfile=$hsfile \
     vsfile=$vsfile ssfile=$ssfile verbose=1 \
-    tmax=$tmax abs=1,1,1,1 mt=$mt pml=$pml pml_thick=$pml_thick > filme_ondas.bin
+    tmax=$tmax abs=1,1,1,1 mt=$mt pml=$pml pml_thick=$pml_thick 2&> /dev/null
 
 # nao consigo visualizar no WSL (talves no Mint?)
-# echo "simulacao concluida! abrindo o filme..."
+echo "simulacao concluida!"
 
 # xmovie < filme_ondas.bin \
 #     n1=$n1 n2=$n2 d1=$d1 d2=$d2 \
