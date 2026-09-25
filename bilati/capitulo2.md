@@ -121,6 +121,22 @@ Essa seção é chamada de *common-shot* (tiro comum), pois temos apenas um tiro
 
 **(a)**
 
-O modelo de velocidades gerado para essa questão foi gerado em [modelo_velocidades_2d.m](./modelo_velocidades_2d.m)
+O modelo de velocidades gerado para essa questão foi gerado em [modelo_velocidades_2d.m](./modelo_velocidades_2d.m). Execute esse script para gerar o arquivo `vel.out`, que sera usado para gerar o modelo de velocidades.
 
-<img src="./velocidades.jpg" width="300"/>
+> Precisamos transpor a matriz de velocidades, pois o comando `susynlv` espera que a matriz de velocidades seja organizada com a profundidade na primeira dimensão e a distância horizontal na segunda dimensão.
+
+```bash
+transp <vel.out n1=1600 | ximage n1=600 n2=1600 d1=1 d2=1 label1="Profundidade Z m" label2="Distancia X m" title="Modelo 2D de Velocidades" legend=1 &
+```
+
+<img src="./velocidades.png" width="300"/>
+
+Execute o script [simular-aquisicao.sh](./simular-aquisicao.sh) para gerar a seção de registro de superfície. O resultado da aquisicao pode ser visualizado com o comando abaixo:
+
+```bash
+suximage <hseis.pml.out perc=99 label1="Tempo s" label2="Offset km" title="Registro de Superficie" legend=1 &
+```
+
+<img src="./registro-superficie.jpg" width="300"/>
+
+Observe que fonte esta localizada no centro da superficie ($x_s=800\text{m}$). Então, essa seção é um *common-shot*, pois temos apenas um tiro, e todos os receptores estão localizados em torno da posição do tiro.
