@@ -1,5 +1,11 @@
 #!/bin/bash
 
+if [ -z "$1" ]
+    then
+    echo "no velocity model (vel.out) supplied"
+    exit 0
+fi
+
 # dimensoes da janela do visualizador X-11
 WIDTH=800
 HEIGHT=600
@@ -19,7 +25,7 @@ mt=10 pml=1 pml_thick=20
 
 echo "iniciando a simulacao por diferenças finitas..."
 
-sufdmod2_pml <vel-difrator.out nz=$n1 dz=$d1 nx=$n2 dx=$d2 \
+sufdmod2_pml <$1 nz=$n1 dz=$d1 nx=$n2 dx=$d2 \
     xs=$xs zs=$zs hsz=$hsz vsx=$vsx hsfile=$hsfile \
     vsfile=$vsfile ssfile=$ssfile verbose=1 \
     tmax=$tmax abs=1,1,1,1 mt=$mt pml=$pml pml_thick=$pml_thick 2&> /dev/null
