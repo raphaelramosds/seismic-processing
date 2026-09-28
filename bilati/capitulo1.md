@@ -126,18 +126,14 @@ Como são valores aproximados, podemos considerar que os resultados obtidos expe
 
 **12.** A estrutura de um dado sísmico no formato SU é composta por $1..N$ traços, cada um contendo um cabeçalho de 240 bytes e um dado binário de 4 bytes por amostra registrada
 
-```md
-+-----------------------+-----------------------+-----+-----------------------+
-|       TRAÇO 1         |       TRAÇO 2         | ... |        TRAÇO N        |
-+-----------------------+-----------------------+-----+-----------------------+
-| [Header] | [Amostras] | [Header] | [Amostras] | ... | [Header] | [Amostras] |
-+-----------------------+-----------------------+-----+-----------------------+
-```
+| TRAÇO 1 | TRAÇO 2 | ... | TRAÇO N |
+|---|---|---|---|
+| `[Header] \| [Amostras]` | `[Header] \| [Amostras]` | ... | `[Header] \| [Amostras]` |
 
 Abaixo a estrutura detalhada de um traço, mostrando o cabeçalho e os dados binários de amostras.
 
 
-```md
+```
 +----------------------------------------------+-----------------------------------------------+
 |          CABEÇALHO DO TRAÇO (HEADER)         |           DADOS BINÁRIOS (SAMPLES)            |
 |                  240 bytes                   |            N x 4 bytes (Float32)              |
