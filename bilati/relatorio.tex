@@ -69,6 +69,9 @@ Raphael Ramos da Silva\par
 \tableofcontents
 \newpage
 
+As implementações apresentadas neste relatório podem ser encontradas no
+repositório \url{https://github.com/raphaelramosds/seismic-processing}.
+
 \section{Fundamentos de Seismic Unix e dados SU}
 
 \subsection{Geração e inspeção de dados sintéticos}
@@ -227,8 +230,7 @@ Ao aumentar as velocidades das interfaces, vemos que o tempo de ida e volta no \
 
 \subsection{Aquisição sintética com \texttt{susynlv}}
 
-O capítulo 2 documenta a geração de dados sintéticos com um refletor plano
-inclinado, incluindo:
+A geração de dados sintéticos com um refletor plano inclinado foi feita conforme as seguintes especificações:
 
 \begin{itemize}
 \item aquisição zero-offset com 101 tiros espaçados de 0,05 km;
@@ -238,6 +240,8 @@ inclinado, incluindo:
 \item seção common-shot com 161 receptores entre $-4$ e $4$ km;
 \item visualização em função do número do tiro, da posição e do offset.
 \end{itemize}
+
+O resultado dessa aquisição pode ser visualizado na figura a seguir
 
 \begin{figure}[H]
 \centering
@@ -292,11 +296,11 @@ suchw < hseis.pml.out key1=gx key2=sx key3=offset b=1 c=1
 
 Essa operação pode ser interpretada como a manipulação da relação
 \[
-gx = sx + offset,
+\text{gx} = \text{sx} + \text{offset},
 \]
 que é equivalente à expressão
 \[
-offset = gx - sx.
+\text{offset} = \text{gx} - \text{sx}.
 \]
 Assim, conhecendo a posição da fonte e o afastamento, calcula-se a posição
 do receptor; inversamente, as posições do receptor e da fonte determinam o
