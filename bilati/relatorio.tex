@@ -79,11 +79,7 @@ suplane > dado.su
 surange < dado.su
 \end{lstlisting}
 
-O material explica os campos de cabeçalho \texttt{tracl}, \texttt{tracr},
-\texttt{offset}, \texttt{ns} e \texttt{dt}, além do campo \texttt{scalco},
-que define o fator de escala das coordenadas. Para o exemplo documentado,
-são gerados 32 traços, 64 amostras por traço e intervalo de amostragem de
-4 ms.
+Para o exemplo documentado, a seguir, são gerados 32 traços, 64 amostras por traço e intervalo de amostragem de 4 ms.
 
 \begin{figure}[H]
 \centering
@@ -181,9 +177,9 @@ destaca a curvatura e tende a realçar componentes de alta frequência.
 O fluxo principal está implementado em \texttt{questao11.m}. Ele é dividido em três etapas:
 
 \begin{enumerate}
-\item definição das profundidades e velocidades das camadas;
-\item cálculo dos tempos de ida e volta, coeficientes de reflexão e perdas acumuladas por transmissão;
-\item convolução da série de amplitudes com o pulso Ricker e visualização do traço sísmico final.
+\item Definição das profundidades e velocidades das camadas.
+\item Cálculo dos tempos de ida e volta, coeficientes de reflexão e perdas acumuladas por transmissão.
+\item Convolução da série de amplitudes com o pulso Ricker e visualização do traço sísmico final.
 \end{enumerate}
 
 Para interfaces entre velocidades $v_i$ e $v_{i+1}$, o coeficiente de
@@ -227,12 +223,12 @@ Ao aumentar as velocidades das interfaces, vemos que o tempo de ida e volta no \
 A geração de dados sintéticos com um refletor plano inclinado foi feita conforme as seguintes especificações:
 
 \begin{itemize}
-\item aquisição zero-offset com 101 tiros espaçados de 0,05 km;
-\item aquisição common-offset com afastamento de 500 m;
+\item Aquisição zero-offset com 101 tiros espaçados de 0,05 km;
+\item Aquisição common-offset com afastamento de 500 m;
 \item validação de \texttt{sx}, \texttt{gx} e \texttt{offset} por
       \texttt{sugethw};
-\item seção common-shot com 161 receptores entre $-4$ e $4$ km;
-\item visualização em função do número do tiro, da posição e do offset.
+\item Seção common-shot com 161 receptores entre $-4$ e $4$ km;
+\item Visualização em função do número do tiro, da posição e do offset.
 \end{itemize}
 
 O resultado dessa aquisição pode ser visualizado na figura a seguir
