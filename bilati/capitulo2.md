@@ -146,3 +146,11 @@ Modificando o modelo de velocidades acima para ter pontos difratores, como mostr
 | Modelo de velocidades | Registro da superficie |
 | :---: | :---: |
 | <img src="./velocidades-difratores.jpg" width="300"/> | <img src="./registro-superficie-difratores.jpg" width="300"/> |
+
+Executando o script [simular-aquisicao-tiros.sh](./simular-aquisicao-tiros.sh) para gerar a seção de registro para 10 tiros ao longo da linha de 16 km, teremos o seguinte resultado:
+
+```bash
+suximage <todos_os_tiros.su perc=99 label1="Tempo s" label2="Offset km" title="Registro de Superficie" legend=1 &
+```
+
+![Registro de superfície com 10 tiros](./todos_os_tiros.jpg)
