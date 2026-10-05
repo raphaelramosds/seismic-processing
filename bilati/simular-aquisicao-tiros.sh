@@ -23,12 +23,12 @@ n2=1600  d2=10
 ARQ_SAIDA_SU="todos_os_tiros.su"
 rm -f "$ARQ_SAIDA_SU"
 
-echo "Iniciando loop de disparos e concatenacao em $ARQ_SAIDA_SU..."
+echo "iniciando loop de disparos e concatenacao em $ARQ_SAIDA_SU..."
 
-# Loop para realizar 100 tiros
+# Loop para realizar 10 tiros
 for i in $(seq 0 9); do
 
-    # Posicao da fonte (avançando 20 metros a cada tiro)
+    # Posicao da fonte (avançando 200 metros a cada tiro)
     xs=$((8000 + i * 200))
     zs=$((100 * $d1))
     hsz=$((100 * $d1))
@@ -49,19 +49,14 @@ for i in $(seq 0 9); do
 
     echo "simulacao concluida!"
 
-    suchw < "$hsfile" key1=offset key2=gx key3=sx b=1 c=-1 >> "$ARQ_SAIDA_SU"
+    # calcular gx a partir dos offsets
+    suchw < "$hsfile" key1=gx key2=sx key3=offset b=1 c=1 >> "$ARQ_SAIDA_SU"
 
     # Limpa arquivos intermediários
     rm -f "$hsfile" "$vsfile" "$ssfile"
 
 done
 
-echo "Processamento concluido! Todos os tiros foram salvos em '$ARQ_SAIDA_SU'."
-
-# xmovie < filme_ondas.bin \
-#     n1=$n1 n2=$n2 d1=$d1 d2=$d2 \
-#     title="Propagacao da Onda Acustica" \
-#     cmap=gray loop=2 interp=0 \
-#     -geometry ${WIDTH}x${HEIGHT}+50+50 &
+echo "processamento concluido! Todos os tiros foram salvos em '$ARQ_SAIDA_SU'."
 
 exit 0

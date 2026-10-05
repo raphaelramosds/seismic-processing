@@ -17,14 +17,13 @@ HEIGHT=600
 n1=600   d1=10
 n2=1600  d2=10
 
-# ximage n1=600 n2=1600 <hseis.pml.out
-
 # Posicao da fonte
 xs=$((800 * $d2))
 zs=$((100 * $d1))
 hsz=$((100 * $d1))
 vsx=$((800 * $d2))
 
+# NAO LEIA hseis.pml.out com ximage, pois ele contem um header em cada traco!!!
 vsfile="vseis.pml.out" ssfile="sseis.pml.out" hsfile="hseis.pml.out"
 
 # Parametros de simulacao
@@ -38,15 +37,10 @@ sufdmod2_pml <$1 nz=$n1 dz=$d1 nx=$n2 dx=$d2 \
     vsfile=$vsfile ssfile=$ssfile verbose=1 \
     tmax=$tmax abs=1,1,1,1 mt=$mt pml=$pml pml_thick=$pml_thick 2&> /dev/null
 
+# calcular gx a partir dos offsets
+suchw < "$hsfile" key1=gx key2=sx key3=offset b=1 c=1 > tiro.su
+
 # nao consigo visualizar no WSL (talves no Mint?)
 echo "simulacao concluida!"
-
-suchw < "$hsfile" key1=offset key2=gx key3=sx b=1 c=-1 > "hseis.su"
-
-# xmovie < filme_ondas.bin \
-#     n1=$n1 n2=$n2 d1=$d1 d2=$d2 \
-#     title="Propagacao da Onda Acustica" \
-#     cmap=gray loop=2 interp=0 \
-#     -geometry ${WIDTH}x${HEIGHT}+50+50 &
 
 exit 0
