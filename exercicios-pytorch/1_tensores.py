@@ -18,6 +18,7 @@
 import torch
 
 def info(tensor: torch.Tensor):
+    print(tensor)
     print(f"""
     shape: {tensor.shape}
     dtype: {tensor.dtype}
@@ -27,19 +28,15 @@ def info(tensor: torch.Tensor):
 print(f"torch v{torch.__version__}")
 
 tlista = torch.tensor([1,2,3,4])
-print(tlista)
 info(tlista)
 
 tmatriz35 = torch.zeros(3,5, dtype=torch.float32)
-print(tmatriz35)
 info(tmatriz35)
 
 tmatriz24 = torch.ones(2, 4, dtype=torch.float32)
-print(tmatriz24)
 info(tmatriz24)
 
 tmatriz33 = torch.rand(3,3, dtype=torch.float32)
-print(tmatriz33)
 info(tmatriz33)
 
 # shape retorna uma instancia do objeto torch.Size
