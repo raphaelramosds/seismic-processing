@@ -10,6 +10,7 @@
 \usepackage{float}
 \usepackage{caption}
 \usepackage{xcolor}
+\usepackage{tikz}
 \usepackage{hyperref}
 \usepackage{listings}
 
@@ -97,15 +98,50 @@ sushw key=sx,gx a=0,400 b=20,20 < dado.su > dado2.su
 sugethw key=sx,gx < dado2.su
 \end{lstlisting}
 
-Assim, a fonte começa em 0 m, o receptor em 400 m e ambas as posições
-avançam 20 m a cada traço. O uso de \texttt{sugethw} permite verificar
-diretamente os valores gravados nos cabeçalhos.
+O \text{sushw} calcula os atributos de \text{key} conforme a fórmula, onde $j$ é o número de elementos no grupo e $i=\text{itr}+d$, e $\text{itr}$ é o número do traço (\textit{gather})
+
+\begin{equation}
+    \text{key} = a + b \cdot (i \mod j) + c \cdot \left[\text{int}\left(\frac{i}{j}\right)\right]
+\end{equation}
+
+Assim, a fonte começa em 0 m, o receptor em 400 m e ambas as posições avançam 20 m a cada traço. O uso de \texttt{sugethw} permite verificar diretamente os valores gravados nos cabeçalhos.
 
 \subsection{Estrutura binária do formato SU}
 
-Cada traço SU é descrito como um cabeçalho de 240 bytes seguido das amostras
-em ponto flutuante de 32 bits. Para $N$ traços, cada um com $n_s$ amostras,
-o tamanho aproximado do arquivo é
+Cada traço SU é descrito como um cabeçalho de 240 bytes seguido das amostras em ponto flutuante de 32 bits (4 \textit{bytes}).
+
+\begin{figure}[H]
+\centering
+\resizebox{\textwidth}{!}{%
+\begin{tikzpicture}[
+  trace/.style={draw, thick, minimum height=1.65cm, inner sep=0pt},
+  header/.style={trace, fill=gray!20, text width=1.15cm, align=center},
+  sampledata/.style={trace, fill=blue!10, text width=2.05cm, align=center}
+]
+  \draw[rounded corners=3pt, very thick, fill=green!4] (0,0) rectangle (15,3.1);
+  \node[font=\bfseries] at (7.5,2.8) {ARQUIVO SU: $N$ traços};
+
+  \node[header] at (1.05,1.4) {H};
+  \node[sampledata] at (2.65,1.4) {BIN};
+  \node[font=\scriptsize] at (1.85,0.28) {Traço 1};
+
+  \node[header] at (4.55,1.4) {H};
+  \node[sampledata] at (6.15,1.4) {BIN};
+  \node[font=\scriptsize] at (5.35,0.28) {Traço 2};
+
+  \node[font=\huge] at (8.85,1.4) {$\cdots$};
+
+  \node[header] at (11.55,1.4) {H};
+  \node[sampledata] at (13.15,1.4) {BIN};
+  \node[font=\scriptsize] at (12.35,0.28) {Traço $N$};
+\end{tikzpicture}%
+}
+\caption{Organização de um arquivo SU: um bloco maior contém $N$ blocos
+menores, e cada traço é dividido entre o cabeçalho (H) e os dados binários (BIN).}
+\label{fig:estrutura-formato-su}
+\end{figure}
+
+Para $N$ traços, cada um com $n_s$ amostras, o tamanho aproximado do arquivo é
 
 \[
   N\left(240 + 4n_s\right)\ \text{bytes}.
@@ -331,6 +367,25 @@ profundidade comum (CDP) a partir das coordenadas de fonte e receptor:
 suchw < todos_os_tiros.su key1=cdp key2=gx key3=sx b=0.5 c=0.5
 susort cdp offset
 \end{lstlisting}
+
+O \texttt{suchw} calcula o valor de um atributo a partir de outros
+campos do cabeçalho, segundo a expressão
+
+\begin{equation}
+    \operatorname{val}(\text{key1}) =
+    \frac{a + b \cdot \operatorname{val}(\text{key2})^{e}
+    + c \cdot \operatorname{val}(\text{key3})^{f}}{d}.
+\end{equation}
+
+Nessa expressão, \texttt{key1} é o campo do cabeçalho que será
+preenchido, enquanto \texttt{key2} e \texttt{key3} são os campos de
+entrada. Os parâmetros $a$, $b$, $c$ e $d$ controlam os coeficientes e
+a escala do resultado, enquanto $e$ e $f$ são os expoentes aplicados aos
+dois campos de entrada. No exemplo, com $b=c=0{,}5$ e os demais
+parâmetros em seus valores padrão, o campo \texttt{cdp} é calculado como
+a média das coordenadas \texttt{gx} e \texttt{sx}.
+
+Observe que, diferentemente do $\text{sushw}$, o $\text{suchw}$ altera um atributo $\text{key1}$ utilizando outros atributos $\text{key2}$ e $\text{key3}$ como entrada 
 
 Depois do cálculo, os traços são ordenados por CDP e podem ser visualizados
 como uma coleção de gathers. Essa organização é uma etapa importante para
