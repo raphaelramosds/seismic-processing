@@ -1,5 +1,36 @@
 PARTE 1 - FUNDAMENTOS DE TENSORES
 
+Exercicio 1 - Criar e inspecionar tensores
+------------------------------------------
+Crie tensores PyTorch com:
+
+1. Uma lista com os valores 1, 2, 3 e 4.
+2. Uma matriz de zeros com formato (3, 5).
+3. Uma matriz de uns com formato (2, 4).
+4. Uma matriz com valores aleatorios e formato (3, 3).
+
+Para cada tensor, imprima:
+- o proprio tensor;
+- shape;
+- dtype;
+- device.
+
+Pergunta: qual e a diferenca entre shape, dtype e device?
+
+Exercicio 2 - Operacoes e broadcasting
+--------------------------------------
+Crie dois tensores de formato (2, 3). Calcule:
+
+- soma;
+- subtracao;
+- multiplicacao elemento a elemento;
+- divisao;
+- media;
+- valor minimo e maximo.
+
+Depois some um tensor de formato (2, 3) com um tensor de formato (3,) (vetor de 3 elementos).
+Explique por que essa operacao funciona.
+
 Exercicio 3 - Indexacao e slicing
 ---------------------------------
 Crie um tensor com valores de 0 ate 23 e transforme-o em uma matriz (4, 6).
