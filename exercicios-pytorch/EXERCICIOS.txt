@@ -1,0 +1,332 @@
+PARTE 1 - FUNDAMENTOS DE TENSORES
+
+Exercicio 3 - Indexacao e slicing
+---------------------------------
+Crie um tensor com valores de 0 ate 23 e transforme-o em uma matriz (4, 6).
+
+Extraia:
+- a primeira linha;
+- a ultima coluna;
+- as duas primeiras linhas;
+- um bloco com linhas 2 e 3 e colunas 3, 4 e 5;
+- todos os valores maiores que 10.
+
+Exercicio 4 - Reshape, view e transpose
+---------------------------------------
+Crie um tensor com shape (2, 3, 4). Gere versoes com:
+
+- shape (6, 4);
+- shape (2, 12);
+- dimensoes trocadas;
+- uma nova dimensao usando unsqueeze;
+- uma dimensao removida usando squeeze.
+
+Registre o shape antes e depois de cada operacao.
+
+Exercicio 5 - Gradientes simples
+-------------------------------
+Crie um tensor x com requires_grad=True e calcule:
+
+    y = (x ** 2).mean()
+
+Chame backward() e imprima x.grad.
+
+Repita usando:
+
+    y = (3 * x + 2).sum()
+
+Compare o gradiente obtido com o resultado esperado matematicamente.
+
+PARTE 2 - AUTOGRAD E OTIMIZACAO
+
+Exercicio 6 - Ajustar uma reta
+-----------------------------
+Crie dados sinteticos seguindo aproximadamente:
+
+    y = 3 * x + 2
+
+Crie dois parametros treinaveis, w e b, e defina:
+
+    y_pred = w * x + b
+
+Use MSELoss e o otimizador SGD ou Adam para aprender w e b.
+
+Requisitos:
+- execute pelo menos 100 iteracoes;
+- imprima a loss a cada 10 iteracoes;
+- mostre os valores finais de w e b.
+
+Resultado esperado: w proximo de 3 e b proximo de 2.
+
+Exercicio 7 - Dataset e DataLoader
+----------------------------------
+Crie uma classe Dataset que gere pares (x, y) para a reta do exercicio
+anterior. Depois:
+
+- crie um DataLoader;
+- use batch_size=8;
+- embaralhe os dados;
+- imprima o shape de um batch;
+- treine novamente o modelo usando batches.
+
+Observe a diferenca entre um tensor com shape (8,) e um tensor com shape
+(8, 1).
+
+Exercicio 8 - Loop de treinamento organizado
+--------------------------------------------
+Separe o treinamento em funcoes:
+
+- train_step;
+- train_epoch;
+- evaluate;
+
+A funcao evaluate deve usar torch.no_grad().
+
+Adicione:
+- zero_grad;
+- backward;
+- optimizer.step;
+- registro da loss media por epoca.
+
+PARTE 3 - CONVOLUCOES
+
+Exercicio 9 - Convolucao 2D manual
+----------------------------------
+Crie uma imagem simples com shape (1, 1, 8, 8), contendo um quadrado
+branco sobre fundo preto.
+
+Crie uma camada:
+
+    torch.nn.Conv2d(1, 2, kernel_size=3, padding=1)
+
+Passe a imagem pela camada e imprima:
+- shape da entrada;
+- shape da saida;
+- valores minimo e maximo da saida.
+
+Explique o significado de:
+- canais de entrada;
+- canais de saida;
+- kernel_size;
+- padding;
+- stride.
+
+Exercicio 10 - Max pooling e mudanca de resolucao
+-------------------------------------------------
+Use MaxPool2d(kernel_size=2) na imagem do exercicio anterior.
+
+Compare os shapes antes e depois do pooling. Depois use ConvTranspose2d ou
+Upsample para aumentar novamente a resolucao.
+
+Pergunta: aumentar a resolucao recupera exatamente a informacao perdida?
+
+Exercicio 11 - Bloco convolucional
+----------------------------------
+Crie um modulo chamado ConvBlock contendo:
+
+- Conv2d;
+- ReLU ou SiLU;
+- outra Conv2d;
+- outra ativacao.
+
+O bloco deve receber um tensor e devolver outro tensor com a mesma altura e
+largura.
+
+Teste o bloco com uma entrada de shape (2, 1, 32, 32).
+
+PARTE 4 - PRIMEIRA U-NET
+
+Exercicio 12 - U-Net minima
+---------------------------
+Implemente uma U-Net pequena com:
+
+- uma etapa de descida;
+- um bottleneck;
+- uma etapa de subida;
+- uma skip connection;
+- uma camada final Conv2d.
+
+Use entrada com shape:
+
+    (batch, canais, altura, largura)
+    (4, 1, 64, 64)
+
+O modelo deve devolver shape:
+
+    (4, 1, 64, 64)
+
+Imprima o shape depois de cada bloco durante o primeiro teste.
+
+Exercicio 13 - Verificar a skip connection
+------------------------------------------
+Na U-Net do exercicio anterior, armazene a ativacao antes do pooling.
+Depois da etapa de subida:
+
+1. confira se as dimensoes espaciais sao iguais;
+2. concatene os tensores no eixo dos canais;
+3. aplique um bloco convolucional;
+4. imprima o numero de canais em cada etapa.
+
+Explique por que a concatenacao acontece no eixo 1.
+
+Exercicio 14 - U-Net para segmentacao simples
+---------------------------------------------
+Crie imagens sinteticas com circulos ou quadrados e suas mascaras binarias.
+
+Treine uma U-Net para prever a mascara. Use:
+
+- BCEWithLogitsLoss ou Dice Loss;
+- Adam;
+- batch_size pequeno;
+- pelo menos 10 epocas.
+
+Durante o treinamento, salve:
+- imagem de entrada;
+- mascara verdadeira;
+- mascara prevista depois de sigmoid.
+
+Exercicio 15 - Overfitting proposital
+-------------------------------------
+Use somente 4 exemplos sinteticos e treine por varias epocas.
+
+O objetivo e fazer a U-Net memorizar esses exemplos.
+
+Registre:
+- loss por epoca;
+- previsao para cada um dos 4 exemplos;
+- diferenca entre treino e validacao.
+
+Pergunta: por que overfitting pode ser util para verificar se o modelo e o
+loop de treinamento estao funcionando?
+
+PARTE 5 - RELACAO COM O DIFFSEIS
+
+Exercicio 16 - Ler a U-Net do repositorio
+-----------------------------------------
+Leia src/unet.py e identifique:
+
+- PositionalEncoding;
+- FeatureWiseAffine;
+- ResnetBlock;
+- SelfAttention;
+- Downsample;
+- Upsample;
+- UNet.forward.
+
+Para cada classe, escreva:
+- entrada esperada;
+- saida produzida;
+- funcao no modelo.
+
+Exercicio 17 - Testar a U-Net do projeto
+---------------------------------------
+Instancie:
+
+    model = UNet(
+        in_channel=2,
+        out_channel=1,
+        image_size=128
+    )
+
+Crie uma entrada aleatoria com shape:
+
+    (2, 2, 128, 128)
+
+Passe-a pelo modelo com um vetor de nivel de ruido e confira se a saida
+possui shape:
+
+    (2, 1, 128, 128)
+
+Use tambem:
+
+    model = model.eval()
+
+e teste o bloco com torch.no_grad().
+
+Exercicio 18 - Entender o condicionamento
+-----------------------------------------
+No DiffSeis, o modelo recebe dois canais:
+
+- x_cond: dado condicional;
+- x_noisy: dado com ruido.
+
+Crie os dois tensores separadamente, concatene-os com torch.cat e imprima
+os shapes antes e depois da concatenacao.
+
+Teste o que acontece quando:
+- os shapes espaciais sao diferentes;
+- o numero de canais nao e o esperado;
+- a concatenacao e feita no eixo errado.
+
+Exercicio 19 - Observar a q_sample
+----------------------------------
+Leia GaussianDiffusion.q_sample em src/diffusion.py.
+
+Crie um sinal sintetico x_start e gere varias versoes com diferentes niveis
+de ruido.
+
+Compare visualmente ou numericamente:
+- sinal original;
+- sinal pouco ruidoso;
+- sinal muito ruidoso.
+
+Calcule a media e o desvio padrao de cada versao.
+
+Exercicio 20 - Pequeno treinamento do DiffSeis
+----------------------------------------------
+Leia scripts/test_train_diffraction.py e execute primeiro somente um passo
+do pipeline.
+
+Depois adapte o teste para:
+- usar uma quantidade pequena de dados;
+- executar 2 ou 3 epocas;
+- imprimir o shape de inputs e targets;
+- imprimir cada componente da loss;
+- usar amp=False;
+- usar gradient clipping com max_norm=1.0.
+
+Nao comece por um treinamento longo. Primeiro confirme que:
+- o dataset retorna formatos corretos;
+- a U-Net produz a saida esperada;
+- a loss e finita;
+- os gradientes nao sao NaN;
+- a loss muda depois de algumas atualizacoes.
+
+CHECKLIST FINAL
+--------------
+
+Antes de considerar os fundamentos aprendidos, verifique se voce consegue:
+
+[ ] Criar e manipular tensores.
+[ ] Explicar batch, canal, altura e largura.
+[ ] Usar Dataset e DataLoader.
+[ ] Calcular uma loss.
+[ ] Executar backward e atualizar parametros.
+[ ] Usar model.train() e model.eval().
+[ ] Usar torch.no_grad().
+[ ] Entender Conv2d e MaxPool2d.
+[ ] Explicar uma skip connection.
+[ ] Implementar uma U-Net pequena.
+[ ] Conferir shapes em cada etapa.
+[ ] Identificar valores NaN e Inf.
+[ ] Executar um passo da U-Net do DiffSeis.
+[ ] Explicar a diferenca entre treinamento e inferencia.
+
+DICAS DE DEBUG
+--------------
+
+Quando algo falhar, imprima primeiro:
+
+    print(tensor.shape)
+    print(tensor.dtype)
+    print(tensor.device)
+    print(torch.isfinite(tensor).all())
+
+Para verificar gradientes:
+
+    for name, parameter in model.named_parameters():
+        if parameter.grad is not None:
+            print(name, parameter.grad.abs().max().item())
+
+Mantenha os primeiros experimentos pequenos. Um modelo que roda em poucos
+segundos e mais facil de entender e depurar do que um treinamento longo.
