@@ -9,6 +9,7 @@
 \usepackage{graphicx}
 \usepackage{float}
 \usepackage{caption}
+\usepackage{subcaption}
 \usepackage{xcolor}
 \usepackage{tikz}
 \usepackage{hyperref}
@@ -154,7 +155,7 @@ $(1000)(240+4\cdot120)=720\,000$ bytes.
 
 \subsection{Convolução de sinais discretos}
 
-O script \texttt{convolucao.m} verifica numericamente que a convolução
+O script \href{https://github.com/raphaelramosds/seismic-processing/blob/main/bilati/convolucao.m}{\texttt{convolucao.m}} verifica numericamente que a convolução
 de sinais finitos com $m$ e $n$ amostras possui $m+n-1$ amostras. O exemplo
 usa sinais de 10 e 15 amostras e, em seguida, substitui os sinais nulos por
 um pulso e um filtro simples para visualizar o resultado.
@@ -168,7 +169,7 @@ um pulso e um filtro simples para visualizar o resultado.
 
 \subsection{Pulso Ricker}
 
-O arquivo \texttt{gerar\_pulso\_ricker.m} implementa a wavelet Ricker em
+O arquivo \href{https://github.com/raphaelramosds/seismic-processing/blob/main/bilati/gerar_pulso_ricker.m}{\texttt{gerar\_pulso\_ricker.m}} implementa a wavelet Ricker em
 uma janela simétrica de $-0{,}1$ a $0{,}1$ s. A frequência de pico é obtida
 a partir do primeiro zero temporal $t_0$:
 
@@ -185,7 +186,7 @@ w(t)=\left(1-2(\pi f_p t)^2\right)
 
 \subsection{Operadores de diferenças}
 
-O script \texttt{convolucao2.m} aplica a uma wavelet Ricker de 20 Hz,
+O script \href{https://github.com/raphaelramosds/seismic-processing/blob/main/bilati/convolucao2.m}{\texttt{convolucao2.m}} aplica a uma wavelet Ricker de 20 Hz,
 amostrada a cada 4 ms, os operadores
 
 \[
@@ -210,7 +211,9 @@ destaca a curvatura e tende a realçar componentes de alta frequência.
 
 \section{Modelagem 1D por refletividade}
 
-O fluxo principal está implementado em \texttt{questao11.m}. Ele é dividido em três etapas:
+O fluxo principal está implementado em
+\href{https://github.com/raphaelramosds/seismic-processing/blob/main/bilati/questao11.m}{\texttt{questao11.m}}.
+Ele é dividido em três etapas:
 
 \begin{enumerate}
 \item Definição das profundidades e velocidades das camadas.
@@ -258,6 +261,19 @@ Ao aumentar as velocidades das interfaces, vemos que o tempo de ida e volta no \
 
 A geração de dados sintéticos com um refletor plano inclinado foi feita conforme as seguintes especificações:
 
+\begin{lstlisting}[language=bash]
+# Zero-offset: 101 tiros separados por 0,05 km
+susynlv nt=501 dt=0.004 nxo=1 dxo=0 fxo=0 nxs=101 dxs=0.05 fxs=0 fpeak=20 ref="1:0,0.5;5,1.5" > exemplo.su
+
+# Common-offset: afastamento constante de 500 m
+susynlv nt=501 dt=0.004 nxo=1 dxo=0 fxo=0.5 nxs=101 dxs=0.05 fxs=0 fpeak=20 ref="1:0,0.5;5,1.5" > exemplo_offset500.su
+
+# Common-shot: um tiro com receptores entre -4 e 4 km
+susynlv nt=501 dt=0.004 nxs=1 fxs=0 dxs=0 fxo=-4.0 dxo=0.05 nxo=161 \
+  fpeak=20 ref="1:-5,0.5;5,3.38" | suximage label1="Tempo (s)" \
+  label2="Offset (km)" perc=99
+\end{lstlisting}
+
 \begin{itemize}
 \item Aquisição zero-offset com 101 tiros espaçados de 0,05 km;
 \item Aquisição common-offset com afastamento de 500 m;
@@ -267,19 +283,40 @@ A geração de dados sintéticos com um refletor plano inclinado foi feita confo
 \item Visualização em função do número do tiro, da posição e do offset.
 \end{itemize}
 
-O resultado dessa aquisição pode ser visualizado na figura a seguir
+Os resultados das aquisições podem ser visualizados nas figuras a seguir.
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=.5\textwidth]{c2-c-tiros-offset-500.jpg}
-\caption{Exemplo de aquisição com offset constante de 500 m.}
+\begin{subfigure}[t]{.32\textwidth}
+  \centering
+  \includegraphics[width=\textwidth]{c2-b-tiros.jpg}
+  \caption{Aquisição zero-offset em função do número do tiro.}
+  \label{fig:susynlv-zero-offset}
+\end{subfigure}
+\hfill
+\begin{subfigure}[t]{.32\textwidth}
+  \centering
+  \includegraphics[width=\textwidth]{c2-c-tiros-offset-500.jpg}
+  \caption{Aquisição common-offset com afastamento de 500 m.}
+  \label{fig:susynlv-common-offset}
+\end{subfigure}
+\hfill
+\begin{subfigure}[t]{.32\textwidth}
+  \centering
+  \includegraphics[width=\textwidth]{c2-q2-common-shot.jpg}
+  \caption{Seção common-shot com receptores entre $-4$ e $4$ km.}
+  \label{fig:susynlv-common-shot}
+\end{subfigure}
+\caption{Resultados das aquisições sintéticas geradas com
+\texttt{susynlv}.}
+\label{fig:susynlv-resultados}
 \end{figure}
 
 \subsection{Modelos de velocidade e diferenças finitas}
 
 \subsection{Modelo estratificado}
 
-O script \texttt{modelo\_velocidades\_2d.m} cria uma malha de 600 pontos em
+O script \href{https://github.com/raphaelramosds/seismic-processing/blob/main/bilati/modelo_velocidades_2d.m}{\texttt{modelo\_velocidades\_2d.m}} cria uma malha de 600 pontos em
 profundidade por 1600 pontos na horizontal. São atribuídas velocidades de
 1500, 2000, 3000 e 4000 m/s a quatro intervalos de profundidade. A matriz
 é gravada no arquivo \texttt{vel.out} em formato binário little-endian
@@ -287,7 +324,7 @@ profundidade por 1600 pontos na horizontal. São atribuídas velocidades de
 
 \subsection{Modelo com difratores}
 
-O script \texttt{modelo\_velocidades\_2d\_difratores.m} parte do mesmo
+O script \href{https://github.com/raphaelramosds/seismic-processing/blob/main/bilati/modelo_velocidades_2d_difratores.m}{\texttt{modelo\_velocidades\_2d\_difratores.m}} parte do mesmo
 modelo estratificado e adiciona duas pequenas regiões com velocidade de
 4000 m/s, representando pontos difratores. O resultado é salvo como
 \texttt{vel-difrator.out}.
@@ -309,8 +346,8 @@ modelo estratificado e adiciona duas pequenas regiões com velocidade de
 
 \subsection{Simulação da aquisição}
 
-Os scripts \texttt{simular-aquisicao.sh} e
-\texttt{simular-aquisicao-tiros.sh} automatizam chamadas ao
+Os scripts \href{https://github.com/raphaelramosds/seismic-processing/blob/main/bilati/simular-aquisicao.sh}{\texttt{simular-aquisicao.sh}} e
+\href{https://github.com/raphaelramosds/seismic-processing/blob/main/bilati/simular-aquisicao-tiros.sh}{\texttt{simular-aquisicao-tiros.sh}} automatizam chamadas ao
 \texttt{sufdmod2\_pml}. O primeiro simula um tiro com fonte no centro da
 superfície; o segundo percorre a linha com dez posições de fonte, avançando
 200 m entre tiros. Em ambos os fluxos, os cabeçalhos dos traços são
@@ -360,7 +397,7 @@ e os resultados são reunidos em arquivos SU para visualização.
 
 \subsection{Organização por CDP}
 
-O script \texttt{calcular-cdp.sh} demonstra o cálculo do ponto de
+O script \href{https://github.com/raphaelramosds/seismic-processing/blob/main/bilati/calcular-cdp.sh}{\texttt{calcular-cdp.sh}} demonstra o cálculo do ponto de
 profundidade comum (CDP) a partir das coordenadas de fonte e receptor:
 
 \begin{lstlisting}[language=bash]
