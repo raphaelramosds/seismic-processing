@@ -1,0 +1,1 @@
+Referencia: https://docs.pytorch.org/docs/2.14/index.html
