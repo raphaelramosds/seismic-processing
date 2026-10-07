@@ -33,7 +33,8 @@ z.backward()
 print(pontos_x.grad)
 
 # 2) estimar o gradiente de y = (3 * x + 2) no ponto x = 5
-x = torch.tensor(5., dtype=torch.float32, requires_grad=True)
+x.grad.zero_()
+# x = torch.tensor(5., dtype=torch.float32, requires_grad=True)
 y = (3 * x + 2).sum()
 y.backward()
 
