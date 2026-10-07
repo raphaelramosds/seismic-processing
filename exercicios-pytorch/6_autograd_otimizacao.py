@@ -66,4 +66,5 @@ for t in range(1,epochs):
 x_teste = -1.0
 y_teste = m*x_teste + bias
 y_teste_pred = w.item() * x_teste + b.item()
-print(f"Real: {y_teste} | Pred: {y_teste_pred:.3f}")
+print(f"real = {y_teste}")
+print(f"pred = {y_teste_pred:.3f}")
