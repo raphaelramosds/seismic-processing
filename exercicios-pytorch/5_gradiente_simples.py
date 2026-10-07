@@ -12,6 +12,8 @@
 
 # Compare o gradiente obtido com o resultado esperado matematicamente.
 
+# Referencia: https://www.geeksforgeeks.org/deep-learning/understanding-pytorchs-autogradgrad-and-autogradbackward/
+
 import torch
 
 # 1) estimar o gradiente de y = x^2 no ponto x = 5
