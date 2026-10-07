@@ -59,6 +59,8 @@ for t in range(1,epochs):
 
     if t % 10 == 0:
         print(f"epoca {t}: MSE = {loss.item():.4f}")
+        # (opcional) exibir gradientes
+        # print(f"gradW = {w.grad.item():.4f}, gradB = {b.grad.item():.4f}")
 
 # testar com um ponto qualquer
 x_teste = -1.0
