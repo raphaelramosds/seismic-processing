@@ -2,3 +2,4 @@
 *.bin
 *.ps
 *.su
+__pycache__
