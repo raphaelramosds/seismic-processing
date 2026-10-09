@@ -88,7 +88,7 @@ ns=32           # precisa ser divisivel por batch_size
 batch_size=8
 m=3
 b=2
-x_data = torch.linspace(-1, 1, ns).reshape(-1, 1)
+x_data = torch.linspace(-1, 1, ns).reshape(-1, 1) # deve ter 1 coluna, e a qtde de linhas fica em aberto
 y_data = m * x_data + b
 print(f"{len(x_data)} amostras")
 
