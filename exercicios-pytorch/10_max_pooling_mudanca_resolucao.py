@@ -52,6 +52,8 @@ c3 = torch.nn.ConvTranspose2d(
 c3_upsample = torch.nn.Upsample(
     scale_factor=2,
     mode="nearest"
+    # Abaixo como funciona o upsampling por nearest:
+    #
     #            a a b b
     # a b   ->   a a b b
     # c d        c c d d
