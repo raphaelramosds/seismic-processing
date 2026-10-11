@@ -40,9 +40,9 @@ c3 = torch.nn.ConvTranspose2d(
     in_channels=n_canais_saida,
     out_channels=n_canais_saida,
     # Para recuperar a dimensao N x N precisamos encontrar o valor de kernel_size tal que:
-    #   (Hin - 1) + (kernel_size - 1) + 1 = N
+    #   (n - 1) + (kernel_size - 1) + 1 = N
     # Numericamente:
-    #   se c2 produz dois kernels 4 x 4, entao Hin = 4
+    #   se c2 produz dois kernels 4 x 4, entao n = 4
     #   se N = 8, entao kernel_size = 5
     # Referencia: https://docs.pytorch.org/docs/2.14/generated/torch.nn.ConvTranspose2d.html
     kernel_size=5

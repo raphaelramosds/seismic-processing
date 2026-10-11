@@ -17,7 +17,8 @@ import torch
 class ConvBlock(torch.nn.Module):
 
     def __init__(self, n_canais):
-        super(ConvBlock, self).__init__()
+        super().__init__()
+        
         self.conv1 = torch.nn.Conv2d(
             in_channels=n_canais,
             out_channels=n_canais,
