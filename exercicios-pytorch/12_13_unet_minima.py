@@ -82,8 +82,15 @@ class NaiveUNet(torch.nn.Module):
         x_up = self.deconv1(x_bottleneck)
         print(f"shape apos deconv1 (subida): {x_up.shape}")
 
-        # concatenar canais
-        x_skip = torch.cat([x_up, x1], dim=1)
+        # NOTE: o objetivo da skip connection eh juntar as informacoes espaciais de alta resolucao (64x64) da etapa de descida
+        # com as informacoes contextuais da etapa de subida. 
+        # NOTE: isso eh feito mantendo a resolucao de ambas e concatentando seus canais em um so tensor. 
+        #   Ex: dois tensores (4,1,64,64) concatenados pela dimensao do canal, se tornam um so (4,2,64,64)
+        x_skip = torch.cat(
+            [x_up, x1], 
+            # NOTE: shape = (batch, canais, altura, largura) entao dim = 0 (batch), dim = 1 (canais), dim = 2 (altura) e dim = 3 (largura)
+            dim=1 # concatenar na dimensao dos canais (dim = 1)
+        )
         print(f"shape apos skip connection: {x_skip.shape}")
 
         saida = self.conv3(x_skip)
@@ -96,5 +103,3 @@ modelo = NaiveUNet()
 entrada = torch.randn(4, 1, 64, 64)
 
 saida = modelo.forward(entrada)
-
-print(saida)
