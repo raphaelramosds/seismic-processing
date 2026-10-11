@@ -82,10 +82,10 @@ class NaiveUNet(torch.nn.Module):
         x_up = self.deconv1(x_bottleneck)
         print(f"shape apos deconv1 (subida): {x_up.shape}")
 
-        # NOTE: o objetivo da skip connection eh juntar as informacoes espaciais de alta resolucao (64x64) da etapa de descida
-        # com as informacoes contextuais da etapa de subida. 
+        # NOTE: o objetivo da skip connection eh juntar as informacoes espaciais de alta resolucao (64x64)
+        # da etapa de descida com as informacoes contextuais da etapa de subida. 
         # NOTE: isso eh feito mantendo a resolucao de ambas e concatentando seus canais em um so tensor. 
-        #   Ex: dois tensores (4,1,64,64) concatenados pela dimensao do canal, se tornam um so (4,2,64,64)
+        # Ex: dois tensores (4,1,64,64) concatenados pela dimensao do canal, se tornam um so (4,2,64,64)
         x_skip = torch.cat(
             [x_up, x1], 
             # NOTE: shape = (batch, canais, altura, largura) entao dim = 0 (batch), dim = 1 (canais), dim = 2 (altura) e dim = 3 (largura)
