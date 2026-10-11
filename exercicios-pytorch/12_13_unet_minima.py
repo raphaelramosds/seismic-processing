@@ -87,6 +87,7 @@ class NaiveUNet(torch.nn.Module):
         # NOTE: isso eh feito mantendo a resolucao de ambas e concatentando seus canais em um so tensor. 
         # Ex: dois tensores (4,1,64,64) concatenados pela dimensao do canal, se tornam um so (4,2,64,64)
         x_skip = torch.cat(
+            # NOTE: para concatenar a dimensao de TODOS tensores devem ser a MESMA
             [x_up, x1], 
             # NOTE: shape = (batch, canais, altura, largura) entao dim = 0 (batch), dim = 1 (canais), dim = 2 (altura) e dim = 3 (largura)
             dim=1 # concatenar na dimensao dos canais (dim = 1)
