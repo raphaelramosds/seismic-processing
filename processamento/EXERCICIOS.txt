@@ -1,0 +1,93 @@
+Módulo 2 — Gathers de reflexão (256×256)
+
+5. Construa uma imagem de refletividade com 2 tendências senoidais
+   - Grid: 256 traces × 256 amostras.
+   - Número de eventos aleatório entre 5 e 50.
+   - Cada evento deve seguir duas curvas senoidais combinadas.
+
+6. Implemente as regras de amplitude/frequência por ramo i
+   - Amostra base a∈[0,0.8], f∈[1,60].
+   - Se i=0: amplitude [a+0.1,a+0.2], frequência [f+1,f+5].
+   - Se i=1: amplitude [0.1,1], frequência [1,65].
+   - Convoluir cada evento com Ricker correspondente.
+
+7. Adicione ruído Gaussiano ao reflection-only gather
+   - Gere 20 gathers e compare histogramas e espectros.
+
+Módulo 3 — Gathers de difração (hiperbólicos)
+
+8. Gerador de eventos hiperbólicos (apex sobre refletor)
+   - Em cada refletor, sorteie número de difrações.
+   - Cada difração com ângulo de abertura aleatório.
+
+9. Parâmetros físicos das difrações
+   - Forçar amplitude menor que a reflexão local.
+   - Forçar frequência maior que a reflexão local.
+
+10. Decaimento de amplitude com distância ao apex
+    - Teste leis de decaimento (exponencial e potência).
+    - Compare visualmente o realismo.
+
+11. Convolução das difrações + validação espectral
+    - Verifique que o conteúdo de alta frequência está maior nas difrações.
+
+Módulo 4 — Segmenting scenario e composição
+
+12. Implemente segmentação aleatória por faixas/patches
+    - Pegue 2 gathers reflection-only e 2 diffraction-only.
+    - Segmente cada um em partes aleatórias.
+
+13. Recombine partes para criar gathers sintéticos novos
+    - Monte novos reflection-only e diffraction-only híbridos.
+    - Verifique continuidade e artefatos.
+
+14. Monte full-wavefield
+    - full = reflection_new + diffraction_new.
+    - Salve pares: (x0=diffraction_new, y=full).
+
+Módulo 5 — Dataset para treino (PyTorch)
+
+15. Gere 2896 gathers base (256×256)
+    - Estrutura de diretórios e metadados (JSON/CSV com parâmetros sorteados).
+
+16. Extraia patches 128×128 aleatórios
+    - 4 patches por gather para chegar em 11.584 amostras.
+    - Garantir diversidade espacial/temporal.
+
+17. Crie torch.utils.data.Dataset condicional
+    - Retorne (x0_patch, y_patch) como tensores [1,128,128].
+    - Normalize para faixa consistente (ex.: z-score ou min-max).
+
+18. Crie DataLoader e teste batch
+    - batch_size=4.
+    - Verifique shapes, tipos, e visualização de alguns batches.
+
+Módulo 6 — Pré-treino c-DDPM e baseline U-Net
+
+19. Implemente cosine noise schedule (T=1000)
+    - Compute alpha_bar_t e sqrt(1-alpha_bar_t).
+    - Plote curvas para validação.
+
+20. Loop de treino mínimo (dry run)
+    - 1–2 épocas só para validar pipeline.
+    - Adam lr=1e-4, batch 4.
+
+21. Treino completo c-DDPM (277 épocas)
+    - Logging de loss por época.
+    - Checkpoints periódicos.
+
+22. Baseline U-Net supervisionado
+    - Entrada: full-wavefield; saída: diffraction-only.
+    - Mesmos hiperparâmetros para comparação justa.
+
+Módulo 7 — Validação e qualidade do dataset
+
+23. Validação estatística dos parâmetros sorteados
+    - Histogramas de amplitudes, frequências, nº de eventos, ângulos.
+
+24. Validação física/geométrica
+    - Checar automaticamente: apex em refletor, difração com menor amplitude e maior frequência.
+
+25. Auditoria visual automática
+    - Gerar painéis: refletividade, reflection-only, diffraction-only, full-wavefield, patches.
+
