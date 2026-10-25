@@ -9,8 +9,8 @@ dt=0.006    # taxa amostragem
 # limites relativos (%) do topo e base para posicao dos refletores
 # t1 e t2: quanto menores, mais perto do topo do gri
 # b1 e b2: quanto maiores, mais perto da base do  grid
-t1, t2 = 0.01, 0.3
-b1, b2 = 0.7, 0.9
+t1, t2 = 0.01, 0.1
+b1, b2 = 0.9, 0.99
 
 # gerador de numeros aleatorios
 rng = np.random.default_rng()
