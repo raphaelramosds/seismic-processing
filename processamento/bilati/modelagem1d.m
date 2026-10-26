@@ -1,32 +1,24 @@
-% =========================================================================
-% SCRIPT PRINCIPAL: EXPERIMENTOS DE MODELAGEM SISMICA 1D
-% =========================================================================
+% experimento modelagem sismica 1D
 clear; clc; close all;
 
-% 1. PARÂMETROS DO MEIO GEOLOGICO (Modifique aqui para os experimentos d/e)
+% parametros do meio geologico 
 z = [0.5; 0.8; 1.1; 1.6; 2.4; 2.6; 2.9; 3.0; 3.5]; % Profundidades (km)
 v = 2*[1.5; 2.7; 2.2; 2.8; 4.5; 3.0; 2.4; 2.6; 3.6]; % Velocidades (km/s)
 
-% 2. PARAMETROS DA AQUISICAO E DO PULSO (Modifique aqui para os experimentos e/f)
+% prametros da aquisicao e do pulso
 dt_amostra = 0.002;  % Intervalo de amostragem (s)
 t0 = 0.025;         % Tempo do 1º zero da Ricker (s) [f_p = 1 / (sqrt(2)*pi*t0)]
 
-% =========================================================================
-% EXECUCAOO DO FLUXO MODULARIZADO
-% =========================================================================
-
-% Etapa A: Modelo geologico -> Refletividade e Amplitudes
+% Modelo geologico -> Refletividade e Amplitudes
 [samples, r_serie, a_serie, dt_acumulado] = gerar_modelo_refletividade(z, v, dt_amostra);
 
-% Etapa B: Geracao do Pulso de Ricker
+% Geracao do Pulso de Ricker
 [ricker, t_ricker] = gerar_pulso_ricker(t0, dt_amostra);
 
-% Etapa C: Convolucao e Modelagem do trraco sismico
+% Convolucao e Modelagem do trraco sismico
 a_ricker = conv(a_serie, ricker, 'same');
 
-% =========================================================================
-% VISUALIZACAO DOS RESULTADOS
-% =========================================================================
+% visualizacao dos resultados
 figure('Name', 'Modelagem Sismica Modularizada', 'Color', 'w');
 
 subplot(3,1,1);
