@@ -6,7 +6,7 @@ from helper import pulso_ricker, convolve_secao, adiciona_ruido_snr, salva_su
 
 ns=256          # amostras
 ntr=256         # tracos
-nrefl=70        # numero de refletores
+nrefl=5        # numero de refletores
 dt=0.006        # taxa amostragem
 dx=12.5         # espacamento entre tracos (m)
 ndif=(5, 20)    # intervalo do numero de difracoes
