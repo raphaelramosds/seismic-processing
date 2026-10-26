@@ -3,7 +3,7 @@
 **Questão 1**
 
 ```bash
-susynlv nt=501 dt=0.004 nxo=1 dxo=0 fxo=0 nxs=101 dxs=0.05 fxs=0 fpeak=20 ref="1:0,0.5;5,1.5" >exemplo.su
+susynlv nt=501 dt=0.004 nxo=1 dxo=0 fxo=0 nxs=101 dxs=0.05 fxs=0 fpeak=20 ref="1:0,0.5;5,1.5" >su/exemplo.su
 ```
 
 **(a)**
@@ -37,10 +37,10 @@ As posições inicial e final de tiro são 0 e 5, respectivamente, com um espaç
 Exibindo com suximage sem ajuste algum
 
 ```bash
-suximage <exemplo.su label2="Tiro" label1="Tempo (s)" perc=99 
+suximage <su/exemplo.su label2="Tiro" label1="Tempo (s)" perc=99 
 ```
 
-<img src="./c2-b-tiros.jpg" width="300"/>
+<img src="./imagens/c2-b-tiros.jpg" width="300"/>
 
 Os valores padrão dos parâmetros que ajustam a escala do eixo horizontal (dimensão lenta) são `f2 = 0.0` e `d2 = 1.0`. Isso quer dizer que o plot vai exibir o eixo horizontal de 0 a 101, que é o número do tiro, com um espaçamento de 1 unidade entre cada tiro.
 
@@ -57,10 +57,10 @@ $$
 $$
 
 ```bash
-suximage f2=0.0 d2=0.05 label2="Ponto Medio (km)" label1="Tempo (s)" <exemplo.su perc=99
+suximage f2=0.0 d2=0.05 label2="Ponto Medio (km)" label1="Tempo (s)" <su/exemplo.su perc=99
 ```
 
-<img src="./c2-b-posicoes.jpg" width="300"/>
+<img src="./imagens/c2-b-posicoes.jpg" width="300"/>
 
 **(c)** Para que todos os traços tenham afastamento de 500m da fonte, ou seja, um common-offset de 500m, precisamos ajustar o parâmetro `fxo` para 0.5 (em km), que é a posição do receptor em relação à fonte. Assim, o afastamento entre a fonte e o receptor será de 500m.
 
@@ -68,7 +68,7 @@ suximage f2=0.0 d2=0.05 label2="Ponto Medio (km)" label1="Tempo (s)" <exemplo.su
 susynlv nt=501 dt=0.004 nxo=1 dxo=0 fxo=0.5 nxs=101 dxs=0.05 fxs=0 fpeak=20 ref="1:0,0.5;5,1.5"
 ```
 
-<img src="./c2-c-tiros-offset-500.jpg" width="300"/>
+<img src="./imagens/c2-c-tiros-offset-500.jpg" width="300"/>
 
 Como os receptores estão mais longe da fonte, visivelmente a partir do instante 0.5 segundos temos uma perda de parte da energia do sinal (observe que não temos mais o ponto de "queda" da onda refletida, quando comparado com a imagem da seção anterior), e um atraso no tempo de chegada do sinal refletido, que é esperado, já que o caminho percorrido pelo sinal é maior.
 
@@ -113,7 +113,7 @@ $$
 susynlv nt=501 dt=0.004 nxs=1 fxs=0 dxs=0 fxo=-4.0 dxo=0.05 nxo=161 fpeak=20 ref="1:-5,0.5;5,3.38" | suximage label1="Tempo (s)" label2="Offset (km)" perc=99
 ```
 
-<img src="./c2-q2-common-shot.jpg" width="300"/>
+<img src="./imagens/c2-q2-common-shot.jpg" width="300"/>
 
 Essa seção é chamada de *common-shot* (tiro comum), pois temos apenas um tiro, e todos os receptores estão localizados em torno da posição do tiro.
 
@@ -137,7 +137,7 @@ suximage <hseis.pml.out perc=99 label1="Tempo s" label2="Offset km" title="Regis
 
 | Modelo de velocidades | Registro da superficie |
 | :---: | :---: |
-| <img src="./velocidades.jpg" width="300"/> | <img src="./registro-superficie.jpg" width="300"/> |
+| <img src="./imagens/velocidades.jpg" width="300"/> | <img src="./imagens/registro-superficie.jpg" width="300"/> |
 
 Observe que fonte esta localizada no centro da superficie ($x_s=800\text{m}$). Então, essa seção é um *common-shot*, pois temos apenas um tiro, e todos os receptores estão localizados em torno da posição do tiro.
 
@@ -145,7 +145,7 @@ Modificando o modelo de velocidades acima para ter pontos difratores, como mostr
 
 | Modelo de velocidades | Registro da superficie |
 | :---: | :---: |
-| <img src="./velocidades-difratores.jpg" width="300"/> | <img src="./registro-superficie-difratores.jpg" width="300"/> |
+| <img src="./imagens/velocidades-difratores.jpg" width="300"/> | <img src="./imagens/registro-superficie-difratores.jpg" width="300"/> |
 
 Executando o script [simular-aquisicao-tiros.sh](./simular-aquisicao-tiros.sh) para gerar a seção de registro para 10 tiros ao longo da linha de 16 km, teremos o seguinte resultado:
 
@@ -153,4 +153,4 @@ Executando o script [simular-aquisicao-tiros.sh](./simular-aquisicao-tiros.sh) p
 suximage <todos_os_tiros.su perc=99 label1="Tempo s" label2="Offset km" title="Registro de Superficie" legend=1 &
 ```
 
-![Registro de superfície com 10 tiros](./todos_os_tiros.jpg)
+![Registro de superfície com 10 tiros](./imagens/todos_os_tiros.jpg)

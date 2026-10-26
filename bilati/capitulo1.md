@@ -23,22 +23,22 @@ O comando abaixo gera uma seção de afastamento comum com 3 eventos inclinados 
 ```bash
 suplane npl=3 | suximage
 ```
-![Exemplo de saída do comando suplane](./16suplane1.png)
+![Exemplo de saída do comando suplane](./imagens/16suplane1.png)
 
 Na figura, o eixo horizontal representa o número do traço (trace number, parâmetro `ntr`) e o eixo vertical representa a amostra temporal (time sample, parâmetro `nt`). O plot mostra as amostras coletadas de 32 traços.
 
 **3.**
 
 ```bash
-suplane >dado.su
+suplane >su/dado.su
 ```
 
-Gera um arquivo chamado `dado.su` contendo uma seção de afastamento comum com 3 eventos inclinados.
+Gera um arquivo chamado `su/dado.su` contendo uma seção de afastamento comum com 3 eventos inclinados.
 
 **4.** 
 
 ```bash
-surange <dado.su
+surange <su/dado.su
 ```
 
 O comando `surange` exibe os valores mínimos e máximos para cada campo do cabeçalho, entre todos os traços de um dado sísmico. 
@@ -63,7 +63,7 @@ Campos do cabeçalho preenchidos:
 **5.** 
 
 ```bash
-sushw key=sx,gx a=0,400 b=20,20 <dado.su >dado2.su
+sushw key=sx,gx a=0,400 b=20,20 <su/dado.su >su/dado2.su
 ```
 
 Nesse comando, as coordenadas horizontais da fonte(`sx`) e do receptor(`gx`) são modificadas, seguindo a seguinte regra:
@@ -73,11 +73,11 @@ Nesse comando, as coordenadas horizontais da fonte(`sx`) e do receptor(`gx`) sã
 Vamos usar o comando `sugethw` para verificar os valores de `sx` e `gx` antes e depois da execução do comando `sushw`.
 
 ```bash
-sugethw key=sx,gx <dado.su
+sugethw key=sx,gx <su/dado.su
 ```
 
 ```bash
-sugethw key=sx,gx <dado2.su
+sugethw key=sx,gx <su/dado2.su
 ```
 
 **6.** A sísmica de reflexão é sensível a contrastes na densidade e no módulo de Bulk do meio, que por sua vez determinam a *velocidade de propagação* das ondas sísmicas.
@@ -88,7 +88,7 @@ sugethw key=sx,gx <dado2.su
 suwaveform type=ricker1 fpeak=15 | suxgraph style=normal
 ```
 
-![Questão 6](./wave-fpeak15.png)
+![Questão 6](./imagens/wave-fpeak15.png)
 
 Pela figura, 
 
