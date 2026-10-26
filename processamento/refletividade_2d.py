@@ -1,5 +1,7 @@
 import numpy as np 
 import matplotlib.pyplot as plt
+from obspy import Stream, Trace
+from obspy.core import AttribDict
 
 ns=256      # amostras
 ntr=256     # tracos
@@ -78,6 +80,21 @@ def adiciona_ruido_snr(sinal, snr_db):
     p_ruido = p_sinal / 10 ** (snr_db / 10)
     return sinal + rng.normal(0, np.sqrt(p_ruido), sinal.shape)
 
+def salva_su(secao, dt, arquivo):
+    """Salva a secao (ns, ntr) em formato SU little-endian"""
+    st = Stream()
+    for k in range(secao.shape[1]):
+        tr = Trace(data=np.ascontiguousarray(secao[:, k], dtype=np.float32))
+        tr.stats.delta = dt
+        tr.stats.su = AttribDict()
+        tr.stats.su.trace_header = AttribDict()
+        # tracl, tracr e cdp
+        tr.stats.su.trace_header.trace_sequence_number_within_line = k + 1
+        tr.stats.su.trace_header.trace_sequence_number_within_segy_file = k + 1
+        tr.stats.su.trace_header.ensemble_number = k + 1
+        st.append(tr)
+    st.write(arquivo, format="SU", byteorder="<")
+
 refl, topo, base = modelo_refletividade(ns, ntr, nrefl=nrefl)
 
 # visualizacao modelo
@@ -112,3 +129,7 @@ ax.set_ylabel("Amostra")
 plt.tight_layout()
 plt.savefig("imagens/secao_2d.jpg", dpi=150, bbox_inches="tight")
 # plt.show()
+
+# exporta secoes em SU (little-endian)
+salva_su(secao, dt, "secao_2d.su")
+salva_su(secao_ruidosa, dt, "secao_2d_ruidosa.su")
