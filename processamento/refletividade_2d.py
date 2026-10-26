@@ -1,7 +1,7 @@
 import numpy as np 
 import matplotlib.pyplot as plt
-from obspy import Stream, Trace
-from obspy.core import AttribDict
+
+from helper import pulso_ricker, convolve_secao, adiciona_ruido_snr, salva_su
 
 ns=256      # amostras
 ntr=256     # tracos
@@ -16,13 +16,6 @@ b1, b2 = 0.9, 0.99
 
 # gerador de numeros aleatorios
 rng = np.random.default_rng()
-
-def pulso_ricker(fp: float, dt: float, ns: int):
-    """Gera pulso ricker com frequencia de pico fp amostrado em dt segundos com ns amostras"""
-    a = (ns * dt) / 2
-    t = np.arange(-a, a, dt)
-    ft = (np.pi * fp * t) ** 2
-    return t, (1.0 - 2.0 * ft) * np.exp(-ft)
 
 def tendencia_senoidal(ntr: int, t_medio: float, amp_max: float):
     """Curva t(x) = t_medio + A sin(2 pi x / comp + fase), em amostras"""
@@ -74,27 +67,6 @@ def modelo_refletividade(ns, ntr, nrefl):
 
     return refl, topo, base
 
-def adiciona_ruido_snr(sinal, snr_db):
-    """Adiciona ruido gaussiano para um SNR especifico (em dB)"""
-    p_sinal = np.mean(sinal ** 2)
-    p_ruido = p_sinal / 10 ** (snr_db / 10)
-    return sinal + rng.normal(0, np.sqrt(p_ruido), sinal.shape)
-
-def salva_su(secao, dt, arquivo):
-    """Salva a secao (ns, ntr) em formato SU little-endian"""
-    st = Stream()
-    for k in range(secao.shape[1]):
-        tr = Trace(data=np.ascontiguousarray(secao[:, k], dtype=np.float32))
-        tr.stats.delta = dt
-        tr.stats.su = AttribDict()
-        tr.stats.su.trace_header = AttribDict()
-        # tracl, tracr e cdp
-        tr.stats.su.trace_header.trace_sequence_number_within_line = k + 1
-        tr.stats.su.trace_header.trace_sequence_number_within_segy_file = k + 1
-        tr.stats.su.trace_header.ensemble_number = k + 1
-        st.append(tr)
-    st.write(arquivo, format="SU", byteorder="<")
-
 if __name__ == "__main__":
     refl, topo, base = modelo_refletividade(ns, ntr, nrefl=nrefl)
 
@@ -114,10 +86,10 @@ if __name__ == "__main__":
     # convolucao de cada traco com a mesma ricker
     _, ricker = pulso_ricker(rng.uniform(10, 40), dt, ns)
     # ricker *= rng.uniform(0.5, 1.5) # ganho de energia
-    secao = np.apply_along_axis(lambda tr: np.convolve(tr, ricker, mode="same"), 0, refl)
+    secao = convolve_secao(refl, ricker)
 
     # aplica ruido gaussiano
-    secao_ruidosa = adiciona_ruido_snr(secao, snr_db=rng.uniform(5, 20))
+    secao_ruidosa = adiciona_ruido_snr(secao, snr_db=rng.uniform(5, 20), rng=rng)
 
     # visualizacao secao convoluida
     vmax = np.abs(secao).max()
@@ -132,5 +104,5 @@ if __name__ == "__main__":
     # plt.show()
 
     # exporta secoes em SU (little-endian)
-    salva_su(secao, dt, "secao_2d.su")
-    salva_su(secao_ruidosa, dt, "secao_2d_ruidosa.su")
+    salva_su(secao, dt, "su/secao_2d.su")
+    salva_su(secao_ruidosa, dt, "su/secao_2d_ruidosa.su")
