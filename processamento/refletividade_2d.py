@@ -5,13 +5,13 @@ from obspy.core import AttribDict
 
 ns=256      # amostras
 ntr=256     # tracos
-nrefl=70    # numero de refletores
+nrefl=10    # numero de refletores
 dt=0.006    # taxa amostragem
 
 # limites relativos (%) do topo e base para posicao dos refletores
 # t1 e t2: quanto menores, mais perto do topo do gri
 # b1 e b2: quanto maiores, mais perto da base do  grid
-t1, t2 = 0.01, 0.1
+t1, t2 = 0.3, 0.4
 b1, b2 = 0.9, 0.99
 
 # gerador de numeros aleatorios
@@ -27,7 +27,7 @@ def pulso_ricker(fp: float, dt: float, ns: int):
 def tendencia_senoidal(ntr: int, t_medio: float, amp_max: float):
     """Curva t(x) = t_medio + A sin(2 pi x / comp + fase), em amostras"""
     x = np.arange(ntr)
-    # amplitude da ondulacao
+    # amplitude da ondulacao 
     amp = rng.uniform(0, amp_max)
     # comprimento de onda
     comp = rng.uniform(0.5 * ntr, 3 * ntr)
@@ -95,41 +95,42 @@ def salva_su(secao, dt, arquivo):
         st.append(tr)
     st.write(arquivo, format="SU", byteorder="<")
 
-refl, topo, base = modelo_refletividade(ns, ntr, nrefl=nrefl)
+if __name__ == "__main__":
+    refl, topo, base = modelo_refletividade(ns, ntr, nrefl=nrefl)
 
-# visualizacao modelo
-fig, ax = plt.subplots(figsize=(6, 5))
-ax.imshow(refl, aspect="auto", cmap="seismic", vmin=-1, vmax=1)
-ax.plot(topo, "k--", lw=1)
-ax.plot(base, "k--", lw=1)
-ax.set_title("Refletividade + tendencias")
-ax.set_xlabel("Traco")
-ax.set_ylabel("Amostra")
+    # visualizacao modelo
+    fig, ax = plt.subplots(figsize=(6, 5))
+    ax.imshow(refl, aspect="auto", cmap="seismic", vmin=-1, vmax=1)
+    ax.plot(topo, "k--", lw=1)
+    ax.plot(base, "k--", lw=1)
+    ax.set_title("Refletividade + tendencias")
+    ax.set_xlabel("Traco")
+    ax.set_ylabel("Amostra")
 
-plt.tight_layout()
-plt.savefig("imagens/refletividade_2d.jpg", dpi=150, bbox_inches="tight")
-# plt.show()
+    plt.tight_layout()
+    plt.savefig("imagens/refletividade_2d.jpg", dpi=150, bbox_inches="tight")
+    # plt.show()
 
-# convolucao de cada traco com a mesma ricker
-_, ricker = pulso_ricker(rng.uniform(10, 40), dt, ns)
-# ricker *= rng.uniform(0.5, 1.5) # ganho de energia
-secao = np.apply_along_axis(lambda tr: np.convolve(tr, ricker, mode="same"), 0, refl)
+    # convolucao de cada traco com a mesma ricker
+    _, ricker = pulso_ricker(rng.uniform(10, 40), dt, ns)
+    # ricker *= rng.uniform(0.5, 1.5) # ganho de energia
+    secao = np.apply_along_axis(lambda tr: np.convolve(tr, ricker, mode="same"), 0, refl)
 
-# aplica ruido gaussiano
-secao_ruidosa = adiciona_ruido_snr(secao, snr_db=rng.uniform(5, 20))
+    # aplica ruido gaussiano
+    secao_ruidosa = adiciona_ruido_snr(secao, snr_db=rng.uniform(5, 20))
 
-# visualizacao secao convoluida
-vmax = np.abs(secao).max()
-fig, ax = plt.subplots(figsize=(6, 5))
-ax.imshow(secao, aspect="auto", cmap="seismic", vmin=-vmax, vmax=vmax)
-ax.set_title("Secao sintetica (refletividade * ricker)")
-ax.set_xlabel("Traco")
-ax.set_ylabel("Amostra")
+    # visualizacao secao convoluida
+    vmax = np.abs(secao).max()
+    fig, ax = plt.subplots(figsize=(6, 5))
+    ax.imshow(secao, aspect="auto", cmap="seismic", vmin=-vmax, vmax=vmax)
+    ax.set_title("Secao sintetica (refletividade * ricker)")
+    ax.set_xlabel("Traco")
+    ax.set_ylabel("Amostra")
 
-plt.tight_layout()
-plt.savefig("imagens/secao_2d.jpg", dpi=150, bbox_inches="tight")
-# plt.show()
+    plt.tight_layout()
+    plt.savefig("imagens/secao_2d.jpg", dpi=150, bbox_inches="tight")
+    # plt.show()
 
-# exporta secoes em SU (little-endian)
-salva_su(secao, dt, "secao_2d.su")
-salva_su(secao_ruidosa, dt, "secao_2d_ruidosa.su")
+    # exporta secoes em SU (little-endian)
+    salva_su(secao, dt, "secao_2d.su")
+    salva_su(secao_ruidosa, dt, "secao_2d_ruidosa.su")
