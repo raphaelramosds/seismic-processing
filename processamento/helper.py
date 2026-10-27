@@ -10,11 +10,11 @@ def pulso_ricker(fp: float, dt: float, ns: int):
     ft = (np.pi * fp * t) ** 2
     return t, (1.0 - 2.0 * ft) * np.exp(-ft)
 
-def convolve_secao(refl, ricker):
+def convolve_secao(refl: np.ndarray, ricker: np.ndarray):
     """Convolve cada traco do modelo de refletividade da secao com a mesma ricker"""
     return np.apply_along_axis(lambda tr: np.convolve(tr, ricker, mode="same"), 0, refl)
 
-def adiciona_ruido_snr(sinal, snr_db, rng=None):
+def adiciona_ruido_snr(sinal: np.ndarray, snr_db: float, rng: np.random.Generator | None = None):
     """Adiciona ruido gaussiano para um SNR especifico (em dB)"""
     if rng is None:
         rng = np.random.default_rng()
@@ -22,7 +22,7 @@ def adiciona_ruido_snr(sinal, snr_db, rng=None):
     p_ruido = p_sinal / 10 ** (snr_db / 10)
     return sinal + rng.normal(0, np.sqrt(p_ruido), sinal.shape)
 
-def salva_su(secao, dt, arquivo):
+def salva_su(secao: np.ndarray, dt: float, arquivo: str):
     """Salva a secao (ns, ntr) em formato SU little-endian"""
     st = Stream()
     for k in range(secao.shape[1]):
