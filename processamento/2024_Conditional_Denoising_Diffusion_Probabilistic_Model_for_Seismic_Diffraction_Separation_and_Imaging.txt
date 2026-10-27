@@ -1,0 +1,101 @@
+Pag 1.
+
+Metodologia PWD: 
+1. aplica transformada Radon no common shot gather
+2. agrupa os gathers por secoes de "common-dip"
+3. aplica filtro PWD para separar as difracoes
+4. aplica transformada inversa Radon para obter o gather com as difracoes
+
+As referencias 25 e 26 do artigo separaram difracoes no common-offset utilizando U-Net
+
+Existem duas formas de gerar as seções sintéticas de treino (gathers com reflexões e difrações):
+1. modelagem convencional da equacao de onda: diferencas finitas e traçado de raios
+2. modelagem convolucional
+
+Autores Zwartjes e Yoo escolheram a segunda opcao, mas tiveram problemas de "reflection leakages", que aconteciam quando os ápices das difrações se sobrepõem aos eventos de reflexão. Para resolver esse problema, precisou-se remover os ápices das difracoes do conjunto de dados.
+
+Pag 2.
+
+DDPM, introduzido por Ho et al. [29] é o Modelo Probabilístico de Difusão para Denoising
+
+Forward process: aplicar um kernel de difusão de Markov na distribuicao de dados (complexa), gradualmente a transformando-a de uma distribuição complexo em uma simples
+
+Denoising process (reverso): aprende a reconstruir a distribiução de dados complexa a partir da distribuição simples gerada no forward
+
+Tanto o forward como o denoising é implementado por uma cadeia que pode ou não ser de Markov, chamadas "Markov chain" e "non-Markov chain", respectivamente
+
+c-DDPM é um DPPM cujo processo de amostragem é condicionado. Com essa abordagem, o c-DPPM podera produzir amostras realísticas baseadas em uma certa condição
+
+O objetivo deste artigo é separar difrações sísmicas no domínio common-offset utilizando a c-DDPM.
+
+Pag. 4
+
+x0: dado com apenas difrações
+y: dado completo que é a condicional da c-DDPM
+
+Encoder (max-pooling e convoluções duplas): diminuem o tamanho da imagem e aumentar os canais de features
+Decoder (upsampling): restaurar as features para o tamanho original da imagem
+Self-attention: matirzes Q, K e V, calculadas pelos operadores Wq, Wk, e Wv separadamente do mapa de caracteristica convolucional
+
+Entradas da rede: 
+xt: dados ruidoso com apenas difracoes
+t: time step (entrada para os blocos MidAtten e ResNet)
+y: campo de onda completo (possui reflexões e difrações)
+
+Pag. 5
+
+No dominio common-offset:
+- Os eventos de reflexao mostram potenciais interfaces geologias de variados formados. 
+- Os eventos de difracao possuem, aproximadamente, curvatura hiperbólica com concavidade para baixo
+
+Podemos ajustar o numero, posicao e formato da refletividade das difracoes e reflexoes. Em maos do modelo de refletividade, ele eh convolvido com wavelets de diferentes amplitudes e frequencias, para gerar conjuntos de dados variados.
+
+No common offset, as difracoes:
+1) possuem seus apices em cima eventos de reflexao (o motivo é geológico, porque as difracoes costumam nascer em descontinuidades dos proprio refletores: bordas de camadas, terminações, falhas que cortam o horizonte)
+2) tem amplitudes muito mais baixas que as reflexoes
+3) possuem frequencias maiores que as reflexoes (IMPORTANTE)
+
+Foram gerados dois tipos de gathers 256x256 (traco x amostra): os que continham apenas difracoes e os que continham apenas reflexoes
+
+Para gerar os gathers com apenas reflexoes: 
+1. Prencha a imagem com sequencias de refletividade (Fig. 6a) controladas por duas tendencias senoidais
+2. Convolver o modelo gerado anteriormente de refletividade com uma mesma wavelet de ricker
+3. Adicione ruido Gaussiano nesses gathers
+
+OBS: a frequencia das wavelets de ricker utilizadas aqui têm sua frequencia e amplitude geradas aleatoriamente, mas todas possuem 256 amostras temporais espaçadas em 6 milissegundos (0,006 s)
+
+Pag 6.
+
+Para gerar os gathers com apenas difracoes:
+1. Escolha aleatoriamente o numero, posicao e angulo aberto da refletividade
+- numero: quantas hiperboles colocar
+- posicao: onde fica o apice de cada hiperbole. Deve ser posicionado em algum refletor. Na pratica, sorteia-se a posicao lateral (o traco x0) e o tempo do apice (t0)
+- open angle: controle o quanto a hiperbole eh aberta ou fechada. Velocidade    
+2. O apice da refletividade eh posicionado em um refletor (Fig 6b)
+3. Convolver cada refletividade com uma wavelet de ricker gerada pela mesma metodologia apresentada nos gathers de reflexoes
+4. A energia da difracao deve decrescer quanto mais longe do ápice
+
+Mais detalhes sobre essa metodologia: P. Zwartjes and J. Yoo, “Common-offset domain reflection–diffraction separation with deep learning,” Geophys. Prospecting, vol. 71, no. 1, pp. 85–101, 2022.
+
+Etapa de segmentação dos gathers:
+1. Escolhemos aleatoriamente um conjunto de gathers de ambos os tipos (somente difracoes e somente reflexoes)
+2. Segmente cada gather em partes aleatorias
+3. Gere novos gathers com essas partes segmentadas
+4. Some os gathers para obter os dados completos y
+
+Os gathers sao 256x256, mas a rede aceita apenas 128x128. Entao, os autores dividem cada gather em patches de 128x128. Para cada gather, escolhe-se um patch aleatorio para a rede treinar.
+
+Entao, se cada um dos 2896 gathers 256x256 foram subdvididos em 4 partes de 128x128, temos 4 * 2896 = 11584 gathers de treinamento.
+
+Pag. 7
+
+Os autores testaram a rede primeiro com uma secao sismica common offset obtida do modelo de velocidade da Fig. 10, atraves do metodo das diferencas finitas. O intervalo de amostragem das amostras foi de 6 ms.
+
+Deste dado common offset, foram extraidos 12 patches (janelas). Os patches com dimensao menores de 128x128 foram espacados com zeros para que a rede pudesse lê-los.
+
+Cada janela começa 25% depois da anterior. Com patches de 128, o passo é de 32 amostras
+
+patch 1: [  0 ... 127]
+patch 2: [ 32 ... 159]
+patch 3: [ 64 ... 191]
+patch 4: [ 96 ... 223]

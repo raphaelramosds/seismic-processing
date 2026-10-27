@@ -1,0 +1,95 @@
+pag. 2
+CNN modificada para separacao de difracoes, combinando
+- residual learning
+- dilated convolutions
+- batch normalization
+
+Difraction CNN model (DCNN)
+
+Metodos de separacao de difracoes tradicionais nao conseguem remover reflexoes completamente e podem "degradar" as difracoes
+
+Features aprendidas pela rede CNN: kinematic, dynamic, amplitude e polarity reversal
+
+"aprender" o resíduo entre os dados rotulados e as entradas da rede (o resíduo é utilizado como novos dados rotulados)
+
+pag.3
+
+Na metodologia deste artigo, Kernels convolucionais dilatados sao utilizados ao inves de kernels convolucionais convencionais
+
+Kernel dilatado eh basicamente um kernel convencional expandido com zeros. A vantagem de fazer isso eh fazer com que o kernel convencional possa ser aplicado em uma maior "janela" do input, sem a necessidade de "aprender" mais pesos
+
+R(y; theta) : resultado da inferencia da rede
+
+R(y; theta) = W_17 * a_16 + b_17
+W_17 : 17-esima matriz de pesos
+b_17 : 17-esima matriz de bias
+a_16 : mapa de caracteristica gerado pela 17-esima camada da CNN
+theta = {W_17, b_17}
+
+theta eh atualizado utilizando o Adam para minimizar a funcao de perda l(theta)
+
+(yi - ri) : diferenca entre o dado sismico completo (yi) e as reflexoes (yi) 
+
+Para atualizacao o alpha (learning rate) no Adam, o autor utiliza a tecnica de Cosine annealing. Basicamente, essa ecnica consiste em reduzir a taxa de aprendizado ("decaying learning rate") a partir de ua epoca em especifico
+
+pag. 4
+
+"como o modelo foi testado?"
+
+O dado sintetico para TESTAR a rede foi gerado aplicando uma "fast Fourier Transform-based explodingreflector modeling algorithm" no modelo de velocidades do Sisgbe2A. 
+
+A fig 4a mostra o modelo de velocidades original com os pontos difratores; dele foi obtido a secao common-offset da figura 5a; depois, para ter uma secao somente com as reflexoes, removeu-se os pontos difratores do modelo de velocidades, para gerar o dado da fig 5a; com essa secao apenas com as reflexoes, calculou-se a diferenca entre o dado da fig 5a e 5b, para obter apenas as difracoes, presente no dado da fig 5c
+
+"como o modelo foi treinado?"
+
+Varios modelos de velocidade foram gerados (figuras 6a, 6b e 6c), nos quais estao presentes pontos difratores e refletores
+
+80% treino / 20% validacao
+batch size de 32
+60 epocas
+learning rate inicial de 0,001
+stride de 5 na direcao transversal e 5 na longitudinal
+
+Uma estrategia de "patch" eh utilizada para iterar sobre cada secao sismica. Essa estrategia consiste em, ao inves de aplicar a CNN em todos os NxN pixels da secao sismica, processamos apenas PxP de cada vez. Neste artigo, foi utilizado um patch 55x55 (P=55)
+
+pag 5
+
+Os resultados dos experimentos mostram bons resultados da DCNN em comparacao com o PWD. Notou-se que o PWD é mais danoso para as difrações (figuras 9a e 9c), principalmente se elas cruzam (interferem) com as curvas de reflexoes
+
+"the PWD method effectively removes smooth and continuous reflection. However, the vertices of the diffractions and portions of the diffractions that interfere with reflections are destroyed"
+
+NOTE: as setas em vermelho nas figuras mostram os pontos em que as curvas de difracoes foram apagadas ou destruidas
+
+No imageamento da secao que a DCNN inferiu, observamos uma maior resolucao das difracoes (10c) quando comparado com o resultado do PWD (10b). A figura 10a representa a migracao do dado real Sisgbe2A
+
+pag 7
+
+dedicada para apresentar como eles treinaram a rede utilizando dados reais (field data)
+- nankai section (NT62-8)
+- viking graben
+
+O autor chama atencao que, especificamente para dados reais (de campo), as separacoes separadas utilizadas para gerar os rotulos foram obtidas utilizando o proprio PWD
+
+"Unlike synthetic data examples, we cannot obtain perfect diffraction data for field seismic data. We obtain diffraction data using the PWD method and use it as a labeled training data set"
+
+Para treinamento, utilizou-se a seguinte configuracao
+
+batch size de 64
+200 epocas
+learning rate inicial de 0,001
+stride de 30 na direcao transversal e 30 na direcao longitudinal
+patch de 100x100
+
+pag 8-9
+
+Comentam sobre as limitacoes da DCNN
+
+NOTE: quanto maior o batch size, mais rapido eh o treinamento
+
+DCNN-1 foi a rede treinada unindo os datasets sinteticos e de campo. Os autores observaram que essa uniao não foi uma boa decisão, porque as difracoes resultantes apresentaram aterfatos e ddestruicoes em algumas partes (22a).
+
+DCNN-2 eh uma versao melhorada do DCNN-1, onde os autores utilizaram novas combinacoes de convolucoes dilatadas. COm isso, obtiveram um melhor resultado (22b)
+
+os autores ressaltam que, para resultados mais precisos, o conjunto de dados de treino nao pode destoar muito dos dados de teste
+
+"it is difficult to achieve an accurate result if the training data set is significantly different from the test data"
