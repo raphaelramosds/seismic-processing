@@ -83,3 +83,19 @@ Etapa de segmentação dos gathers:
 3. Gere novos gathers com essas partes segmentadas
 4. Some os gathers para obter os dados completos y
 
+Os gathers sao 256x256, mas a rede aceita apenas 128x128. Entao, os autores dividem cada gather em patches de 128x128. Para cada gather, escolhe-se um patch aleatorio para a rede treinar.
+
+Entao, se cada um dos 2896 gathers 256x256 foram subdvididos em 4 partes de 128x128, temos 4 * 2896 = 11584 gathers de treinamento.
+
+Pag. 7
+
+Os autores testaram a rede primeiro com uma secao sismica common offset obtida do modelo de velocidade da Fig. 10, atraves do metodo das diferencas finitas. O intervalo de amostragem das amostras foi de 6 ms.
+
+Deste dado common offset, foram extraidos 12 patches (janelas). Os patches com dimensao menores de 128x128 foram espacados com zeros para que a rede pudesse lê-los.
+
+Cada janela começa 25% depois da anterior. Com patches de 128, o passo é de 32 amostras
+
+patch 1: [  0 ... 127]
+patch 2: [ 32 ... 159]
+patch 3: [ 64 ... 191]
+patch 4: [ 96 ... 223]
