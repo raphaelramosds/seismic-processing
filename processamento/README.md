@@ -16,8 +16,16 @@
 Os scripts devem ser executados a partir de `dados_sinteticos/`, pois usam caminhos relativos a esse diretório:
 
 ```bash
+# OBRIGATORIO
 cd dados_sinteticos
+
+# exemplo: executar o script PY sem parametros
 python refletividade_2d.py
+
+# exemplo: executar o script PY com parametros
 python patches_2d.py su/difracoes/secao_2d_total.su 4 --saida su/patches
+
+# exemplo: executar o script SH com parametros
+chmod +x gerar_patches.sh
 ./gerar_patches.sh 4   # N = 4 por padrao
 ```
