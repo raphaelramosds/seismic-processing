@@ -5,6 +5,7 @@ set -euo pipefail
 N=${1:-4}           # numero de patches (par)
 SAIDA=su/patches    # diretorio de saida dos patches
 
+# resolver arquivos neste diretorio
 cd "$(dirname "$0")"
 
 # Gera uma secao sintetica com difracoes e 
