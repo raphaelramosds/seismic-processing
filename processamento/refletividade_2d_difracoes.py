@@ -1,8 +1,7 @@
 import numpy as np
-import matplotlib.pyplot as plt
 
 from refletividade_2d import modelo_refletividade
-from helper import pulso_ricker, convolve_secao, adiciona_ruido_snr, salva_su
+from utils import pulso_ricker, convolve_secao, adiciona_ruido_snr, salva_su
 
 ns=256          # amostras
 ntr=256         # tracos
@@ -81,43 +80,8 @@ if __name__ == "__main__":
     secao_total = secao_refl + secao_dif
     secao_total_ruidosa = adiciona_ruido_snr(secao_total, snr_db=rng.uniform(5, 20), rng=rng)
 
-    # visualizacao modelos de refletividade
-    fig, axs = plt.subplots(1, 2, figsize=(12, 5))
-    axs[0].imshow(refl, aspect="auto", cmap="seismic", vmin=-1, vmax=1)
-    axs[0].set_title("Refletividade das reflexoes")
-    vmax = np.abs(dif).max()
-    axs[1].imshow(dif, aspect="auto", cmap="seismic", vmin=-vmax, vmax=vmax)
-    axs[1].plot(*zip(*apices), "k.", ms=4)
-    axs[1].set_title("Refletins, ntr, nrefl, dt, rng,vidade das difracoes (apices em preto)")
-    for ax in axs:
-        ax.set_xlabel("Traco")
-        ax.set_ylabel("Amostra")
-
-    plt.tight_layout()
-    plt.savefig("imagens/refletividade_2d_difracoes.jpg", dpi=150, bbox_inches="tight")
-    # plt.show()
-
-    # visualizacao secoes convoluidas
-    secoes = (
-        (secao_refl, "Reflexoes"),
-        (secao_dif, "Difracoes"),
-        (secao_total, "Reflexoes + difracoes"),
-        (secao_total_ruidosa, "Reflexoes + difracoes (ruidosa)"),
-    )
-    fig, axs = plt.subplots(1, 4, figsize=(20, 5))
-    for ax, (s, titulo) in zip(axs, secoes):
-        vmax = np.abs(s).max()
-        ax.imshow(s, aspect="auto", cmap="seismic", vmin=-vmax, vmax=vmax)
-        ax.set_title(titulo)
-        ax.set_xlabel("Traco")
-        ax.set_ylabel("Amostra")
-
-    plt.tight_layout()
-    plt.savefig("imagens/secao_2d_difracoes.jpg", dpi=150, bbox_inches="tight")
-    # plt.show()
-
     # exporta secoes em SU (little-endian)
-    salva_su(secao_refl, dt, "su/secao_2d_reflexoes.su")
-    salva_su(secao_dif, dt, "su/secao_2d_difracoes.su")
-    salva_su(secao_total, dt, "su/secao_2d_total.su")
-    salva_su(secao_total_ruidosa, dt, "su/secao_2d_total_ruidosa.su")
+    salva_su(secao_refl, dt, "su/difracoes/secao_2d_reflexoes.su")
+    salva_su(secao_dif, dt, "su/difracoes/secao_2d_difracoes.su")
+    salva_su(secao_total, dt, "su/difracoes/secao_2d_total.su")
+    salva_su(secao_total_ruidosa, dt, "su/difracoes/secao_2d_total_ruidosa.su")

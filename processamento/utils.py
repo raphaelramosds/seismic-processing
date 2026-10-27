@@ -1,6 +1,6 @@
 import os
 import numpy as np
-from obspy import Stream, Trace
+from obspy import Stream, Trace, read
 from obspy.core import AttribDict
 
 def pulso_ricker(fp: float, dt: float, ns: int):
@@ -37,3 +37,9 @@ def salva_su(secao: np.ndarray, dt: float, arquivo: str):
         st.append(tr)
     os.makedirs(os.path.dirname(arquivo) or ".", exist_ok=True)
     st.write(arquivo, format="SU", byteorder="<")
+
+def le_su(arquivo: str):
+    """Le um arquivo SU little-endian e retorna a secao (ns, ntr) e o dt"""
+    st = read(arquivo, format="SU", byteorder="<")
+    secao = np.stack([tr.data for tr in st], axis=1)
+    return secao, st[0].stats.delta

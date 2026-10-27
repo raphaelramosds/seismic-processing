@@ -1,7 +1,6 @@
-import numpy as np 
-import matplotlib.pyplot as plt
+import numpy as np
 
-from helper import pulso_ricker, convolve_secao, adiciona_ruido_snr, salva_su
+from utils import pulso_ricker, convolve_secao, adiciona_ruido_snr, salva_su
 
 ns=256      # amostras
 ntr=256     # tracos
@@ -70,19 +69,6 @@ def modelo_refletividade(ns, ntr, nrefl):
 if __name__ == "__main__":
     refl, topo, base = modelo_refletividade(ns, ntr, nrefl=nrefl)
 
-    # visualizacao modelo
-    fig, ax = plt.subplots(figsize=(6, 5))
-    ax.imshow(refl, aspect="auto", cmap="seismic", vmin=-1, vmax=1)
-    ax.plot(topo, "k--", lw=1)
-    ax.plot(base, "k--", lw=1)
-    ax.set_title("Refletividade + tendencias")
-    ax.set_xlabel("Traco")
-    ax.set_ylabel("Amostra")
-
-    plt.tight_layout()
-    plt.savefig("imagens/refletividade_2d.jpg", dpi=150, bbox_inches="tight")
-    # plt.show()
-
     # convolucao de cada traco com a mesma ricker
     _, ricker = pulso_ricker(rng.uniform(10, 40), dt, ns)
     # ricker *= rng.uniform(0.5, 1.5) # ganho de energia
@@ -90,18 +76,6 @@ if __name__ == "__main__":
 
     # aplica ruido gaussiano
     secao_ruidosa = adiciona_ruido_snr(secao, snr_db=rng.uniform(5, 20), rng=rng)
-
-    # visualizacao secao convoluida
-    vmax = np.abs(secao).max()
-    fig, ax = plt.subplots(figsize=(6, 5))
-    ax.imshow(secao, aspect="auto", cmap="seismic", vmin=-vmax, vmax=vmax)
-    ax.set_title("Secao sintetica (refletividade * ricker)")
-    ax.set_xlabel("Traco")
-    ax.set_ylabel("Amostra")
-
-    plt.tight_layout()
-    plt.savefig("imagens/secao_2d.jpg", dpi=150, bbox_inches="tight")
-    # plt.show()
 
     # exporta secoes em SU (little-endian)
     salva_su(secao, dt, "su/secao_2d.su")
