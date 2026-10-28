@@ -6,30 +6,65 @@ def self_attention(X):
     batch_size, seq_len, d_model = X.shape
 
     d_k = d_model
-    W_q = np.random.randn(d_model, d_k)
-    W_k = np.random.randn(d_model, d_k)
-    W_v = np.random.randn(d_model, d_k)
+
+    # colocar Q, K e V ficam na mesma escala de X, normalizando por sqrt(d_model)
+    W_q = np.random.randn(d_model, d_k) / np.sqrt(d_model)
+    W_k = np.random.randn(d_model, d_k) / np.sqrt(d_model)
+    W_v = np.random.randn(d_model, d_k) / np.sqrt(d_model)
 
     Q = X @ W_q
     K = X @ W_k
-    V = X @ W_k
+    V = X @ W_v
 
-    # Se K.shape = (1,3,4), entao K.transpose(0,2,1) vai trocar a terceira dimensao (4) com a segunda (3)
-    # Entao, o K transposto vai ter shape (1,4,3)
+    # se K.shape = (1,3,4), entao K.transpose(0,2,1) vai trocar a terceira dimensao (4) com a segunda (3)
+    # entao, o K transposto vai ter shape (1,4,3)
     scores = Q @ K.transpose(0, 2, 1) / np.sqrt(d_k)
 
+    # softmax estavel: subtrair o maximo de cada linha garante expoentes <= 0, evitando overflow do np.exp
+    scores = scores - scores.max(axis=-1, keepdims=True)
+
+    # pesos da camada de atencao: scores normalizados
     attention_weights = np.exp(scores) / np.sum(np.exp(scores), axis=-1, keepdims=True)
 
     output = attention_weights @ V
 
     return output, attention_weights
 
-np.random.seed(42)
+def positional_encoding(seq_len, d_model):
+    """
+    Matriz de Positional Encoding (PE) para ser somado ao array de entrada X
 
-X = np.random.rand(1, 128, 128)
+    Args.
+        seq_len (int): tamanho da sequencia da entrada
+        d_model (int): dimensao do vetor de cada token
+        
+        E.g, para uma entrada (1,128,128) sao 128 (seq_len) tokens cada um com 128 features (d_model)
 
-output, weights = self_attention(X)
+    Note. 
+        1. A self-attention nao sabe a ordem dos tokens. Se embaralharmos as linhas de X, a saida sai embaralhada mesmo jeito
+        2. Em muitos problemas, a ordem importa, por exemplo:
+            - Na semantica: "o cao mordeu o homem" e "o homem mordeu o cao" sao diferentes
+            - Nos dados sismicos: a amostra no tempo 100ms nao eh a mesma coisa que a amostra em 2s, e a ordem dos tracos tambem carrega informacao
+        3. O PE deve ser somado a X antes de coloca-lo na camada de atencao (self_attention)
+    """
+    pos = np.arange(seq_len)[:, None]   # (seq_len, 1)
+    i = np.arange(0, d_model, 2)        # indices pares: 0, 2, 4, ...
+    div = 10000 ** (i / d_model)        # (d_model/2,)
 
-print("output: ", output.shape)
+    pe = np.zeros((seq_len, d_model))
+    pe[:, 0::2] = np.sin(pos / div)                     # colunas pares
+    pe[:, 1::2] = np.cos(pos / div)[:, :d_model // 2]   # colunas ímpares
+    return pe
 
-print("\nattention weights: ", weights.shape)
+if __name__ == "__main__":
+    np.random.seed(42)
+
+    X = np.random.rand(1, 128, 128)
+    batch_size, seq_len, d_model = X.shape
+
+    X_encoded = positional_encoding(seq_len=seq_len, d_model=d_model)
+
+    output, weights = self_attention(X + X_encoded)
+
+    print("output: ", output.shape)
+    print("\nattention weights: ", weights.shape)
