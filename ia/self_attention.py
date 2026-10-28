@@ -66,5 +66,6 @@ if __name__ == "__main__":
 
     output, weights = self_attention(X + X_encoded)
 
-    print("output: ", output.shape)
+    print("x encoded:", X_encoded.shape)
+    print("\noutput: ", output.shape)
     print("\nattention weights: ", weights.shape)
