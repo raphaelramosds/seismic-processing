@@ -1,16 +1,9 @@
 import numpy as np
 
-def self_attention(X):
+def self_attention(X, W_q, W_k, W_v):
     """Aplica self-attention em uma entrada X"""
-
     batch_size, seq_len, d_model = X.shape
-
     d_k = d_model
-
-    # colocar Q, K e V ficam na mesma escala de X, normalizando por sqrt(d_model)
-    W_q = np.random.randn(d_model, d_k) / np.sqrt(d_model)
-    W_k = np.random.randn(d_model, d_k) / np.sqrt(d_model)
-    W_v = np.random.randn(d_model, d_k) / np.sqrt(d_model)
 
     Q = X @ W_q
     K = X @ W_k
@@ -62,10 +55,31 @@ if __name__ == "__main__":
     X = np.random.rand(1, 128, 128)
     batch_size, seq_len, d_model = X.shape
 
+    # inicializar os pesos de query, key e value
+    # NOTE: colocar Q, K e V na mesma escala de X normalizando por sqrt(d_model)
+    W_q = np.random.randn(d_model, d_model) / np.sqrt(d_model)
+    W_k = np.random.randn(d_model, d_model) / np.sqrt(d_model)
+    W_v = np.random.randn(d_model, d_model) / np.sqrt(d_model)
+
+    # aplicar encoding posicional
     X_encoded = positional_encoding(seq_len=seq_len, d_model=d_model)
 
-    output, weights = self_attention(X + X_encoded)
+    # colocar no bloco de self attention os tokens somados ao positional encoding
+    output, weights = self_attention(X + X_encoded, W_q, W_k, W_v)
 
     print("x encoded:", X_encoded.shape)
     print("\noutput: ", output.shape)
     print("\nattention weights: ", weights.shape)
+
+    perm = np.random.permutation(seq_len)
+
+    # teste sem PE: as saidas sao as mesmas, independente se esta embaralhado
+    # entao, sem PE, a rede nao respeita a ordem das features
+    out, _ = self_attention(X, W_q, W_k, W_v)
+    out_perm, _ = self_attention(X[:, perm], W_q, W_k, W_v)
+    print("sem PE, ordem ignorada:", np.allclose(out[:, perm], out_perm))
+
+    # com PE: o PE fica fixo nas posicoes, entao embaralhar os tokens muda a saida
+    out, _ = self_attention(X + X_encoded, W_q, W_k, W_v)
+    out_perm, _ = self_attention(X[:, perm] + X_encoded, W_q, W_k, W_v)
+    print("com PE, ordem ignorada:", np.allclose(out[:, perm], out_perm))
