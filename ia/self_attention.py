@@ -75,6 +75,7 @@ if __name__ == "__main__":
 
     # teste sem PE: as saidas sao as mesmas, independente se esta embaralhado
     # entao, sem PE, a rede nao respeita a ordem das features
+    # NOTE: np.allclose retorna True se dois arrays Numpy sao iguais
     out, _ = self_attention(X, W_q, W_k, W_v)
     out_perm, _ = self_attention(X[:, perm], W_q, W_k, W_v)
     print("sem PE, ordem ignorada:", np.allclose(out[:, perm], out_perm))
