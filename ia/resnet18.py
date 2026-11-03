@@ -147,7 +147,7 @@ scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=30, gamma=0.1)
 
 # REFERENCIA: https://www.geeksforgeeks.org/deep-learning/resnet18-from-scratch-using-pytorch/
 
-num_epochs = 10
+num_epochs = 5
 train_losses, train_acc_list, test_acc_list = [], [], []
 
 for epoch in range(num_epochs):
@@ -204,4 +204,8 @@ plt.ylabel('Accuracy (%)')
 plt.title('Accuracy')
 plt.legend()
 
-plt.show()
+# salva a figura em ia/imagens ao inves de exibi-la
+images_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'imagens')
+os.makedirs(images_dir, exist_ok=True)
+plt.savefig(os.path.join(images_dir, 'resnet18_treino.png'), dpi=150, bbox_inches='tight')
+plt.close()
