@@ -1,9 +1,11 @@
+import os
 import torch
 import torch.nn as nn
 import torch.optim as optim
 import torch.nn.functional as F
 import torchvision
 import torchvision.transforms as transforms
+from torchvision.datasets.utils import extract_archive
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -26,11 +28,20 @@ transform_test = transforms.Compose([
                          (0.2023, 0.1994, 0.2010))
 ])
 
+# so baixa o dataset se o arquivo compactado ainda nao existir
+data_root = './data'
+archive_path = os.path.join(data_root, 'cifar-10-python.tar.gz')
+download = not os.path.exists(archive_path)
+
+# o arquivo existe mas ainda nao foi extraido
+if not download and not os.path.isdir(os.path.join(data_root, 'cifar-10-batches-py')):
+    extract_archive(archive_path, data_root)
+
 # datasets e loaders de treino e de teste
-trainset = torchvision.datasets.CIFAR10(root='./data', train=True, download=True, transform=transform_train)
+trainset = torchvision.datasets.CIFAR10(root=data_root, train=True, download=download, transform=transform_train)
 trainloader = torch.utils.data.DataLoader(trainset, batch_size=128, shuffle=True, num_workers=2)
 
-testset = torchvision.datasets.CIFAR10(root='./data', train=False, download=True, transform=transform_test)
+testset = torchvision.datasets.CIFAR10(root=data_root, train=False, download=download, transform=transform_test)
 testloader = torch.utils.data.DataLoader(testset, batch_size=100, shuffle=False, num_workers=2)
 
 classes = ('plane','car','bird','cat','deer','dog','frog','horse','ship','truck')
@@ -38,7 +49,7 @@ classes = ('plane','car','bird','cat','deer','dog','frog','horse','ship','truck'
 # definir o bloco de residuo conforme a RestNet18
 # NOTE: o bloco de residuo previne o desaparecimento do gradiente
 # NOTE: ele contem duas camadas convolucionais (Conv), cada uma seguida por
-# uma camada de normlizacao em batch (BatchNorm) e ReLU
+# uma camada de normalizacao em batch (BatchNorm) e ReLU
 class ResidualBlock(nn.Module):
     def __init__(self, in_channels, out_channels, stride=1):
         super(ResidualBlock, self).__init__()
@@ -123,8 +134,10 @@ class ResNet18(nn.Module):
         out = self.fc(out)
         return out
 
+# usa a GPU se estiver disponivel, senao a CPU
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+
 model = ResNet18().to(device)
-print(model)
 
 # definir a funcao de perda como entropia cruzada, SGD como otimizador e
 # um cronograma (scheduler) para reduzir a taxa de aprendizado durante o treinamento
@@ -133,3 +146,62 @@ optimizer = optim.SGD(model.parameters(), lr=0.1, momentum=0.9, weight_decay=5e-
 scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=30, gamma=0.1)
 
 # REFERENCIA: https://www.geeksforgeeks.org/deep-learning/resnet18-from-scratch-using-pytorch/
+
+num_epochs = 10
+train_losses, train_acc_list, test_acc_list = [], [], []
+
+for epoch in range(num_epochs):
+    # treino
+    model.train()
+    running_loss = 0.0
+    correct, total = 0, 0
+    for inputs, labels in trainloader:
+        inputs, labels = inputs.to(device), labels.to(device)
+        optimizer.zero_grad()
+        outputs = model(inputs) # forward
+        loss = criterion(outputs, labels)
+        loss.backward()
+        optimizer.step()
+        running_loss += loss.item() * inputs.size(0)
+        _, predicted = outputs.max(1)
+        total += labels.size(0)
+        correct += predicted.eq(labels).sum().item()
+    
+    train_loss = running_loss / len(trainloader.dataset)
+    train_acc = 100. * correct / total
+    train_losses.append(train_loss)
+    train_acc_list.append(train_acc)
+
+    # validacao
+    model.eval()
+    correct, total = 0, 0
+    with torch.no_grad():
+        for inputs, labels in testloader:
+            inputs, labels = inputs.to(device), labels.to(device)
+            outputs = model(inputs)
+            _, predicted = outputs.max(1)
+            total += labels.size(0)
+            correct += predicted.eq(labels).sum().item()
+    test_acc = 100. * correct / total
+    test_acc_list.append(test_acc)
+    
+    scheduler.step()
+    print(f'Epoch [{epoch+1}/{num_epochs}] Train Loss: {train_loss:.4f} | Train Acc: {train_acc:.2f}% | Test Acc: {test_acc:.2f}%')
+
+plt.figure(figsize=(12,5))
+plt.subplot(1,2,1)
+plt.plot(train_losses, label='Train Loss')
+plt.xlabel('Epochs')
+plt.ylabel('Loss')
+plt.title('Training Loss')
+plt.legend()
+
+plt.subplot(1,2,2)
+plt.plot(train_acc_list, label='Train Accuracy')
+plt.plot(test_acc_list, label='Test Accuracy')
+plt.xlabel('Epochs')
+plt.ylabel('Accuracy (%)')
+plt.title('Accuracy')
+plt.legend()
+
+plt.show()
