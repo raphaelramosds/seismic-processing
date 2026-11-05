@@ -1,7 +1,7 @@
 {
     "nmodelos": 100,
-    "nrefl": 5,
-    "ndif": 3,
+    "nrefl": [5, 50],
+    "ndif": [0, 4],
     "npatches": 4,
     "saida": "su/dataset",
     "ns": 256,
