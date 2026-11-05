@@ -14,11 +14,38 @@ vel=(1500, 5000) # intervalo de velocidades (m/s): controla a abertura da hiperb
 # gerador de numeros aleatorios
 rng = np.random.default_rng()
 
+def adiciona_difracao(dif, x0, t0, vel=vel, dt=dt, dx=dx):
+    """Soma em dif (ns, ntr) uma hiperbole de difracao com apice no traco x0 e amostra t0"""
+    ns, ntr = dif.shape
+    tracos = np.arange(ntr)
+
+    # abertura da hiperbole: quanto maior a velocidade, mais aberta
+    v = rng.uniform(*vel)
+
+    # amplitude da difracao: bem menor que a das reflexoes
+    amp = rng.choice([-1, 1]) * rng.uniform(0.05, 0.3)
+
+    # tempo de transito da difracao (em amostras)
+    # t(x) = sqrt(t0^2 + (2 (x - x0) dx / v)^2)
+    t0_s = t0 * dt
+    tk = np.sqrt(t0_s ** 2 + (2 * (tracos - x0) * dx / v) ** 2) / dt
+
+    # energia decresce com a distancia ao apice:
+    # espalhamento geometrico (t0 / t) e atenuacao lateral gaussiana
+    largura = rng.uniform(0.05, 0.3) * ntr
+    decai = (t0 / tk) * np.exp(-0.5 * ((tracos - x0) / largura) ** 2)
+
+    # distribui a amplitude entre as amostras vizinhas (mesmo esquema da refletividade)
+    i0 = np.floor(tk).astype(int)
+    w = tk - i0
+    for i, peso in ((i0, 1 - w), (i0 + 1, w)):
+        ok = (i >= 0) & (i < ns)
+        dif[i[ok], tracos[ok]] += amp * decai[ok] * peso[ok]
+
 def modelo_difracoes(refl, ndif, vel):
     """Gera refletividade de difracoes com apices posicionados sobre os refletores"""
     ns, ntr = refl.shape
     dif = np.zeros((ns, ntr))
-    tracos = np.arange(ntr)
 
     # numero de hiperboles
     n = rng.integers(ndif[0], ndif[1] + 1)
@@ -35,36 +62,17 @@ def modelo_difracoes(refl, ndif, vel):
             continue
         t0 = rng.choice(cand)
 
-        # abertura da hiperbole: quanto maior a velocidade, mais aberta
-        v = rng.uniform(*vel)
-
-        # amplitude da difracao: bem menor que a das reflexoes
-        amp = rng.choice([-1, 1]) * rng.uniform(0.05, 0.3)
-
-        # tempo de transito da difracao (em amostras)
-        # t(x) = sqrt(t0^2 + (2 (x - x0) dx / v)^2)
-        t0_s = t0 * dt
-        tk = np.sqrt(t0_s ** 2 + (2 * (tracos - x0) * dx / v) ** 2) / dt
-
-        # energia decresce com a distancia ao apice:
-        # espalhamento geometrico (t0 / t) e atenuacao lateral gaussiana
-        largura = rng.uniform(0.05, 0.3) * ntr
-        decai = (t0 / tk) * np.exp(-0.5 * ((tracos - x0) / largura) ** 2)
-
-        # distribui a amplitude entre as amostras vizinhas (mesmo esquema da refletividade)
-        i0 = np.floor(tk).astype(int)
-        w = tk - i0
-        for i, peso in ((i0, 1 - w), (i0 + 1, w)):
-            ok = (i >= 0) & (i < ns)
-            dif[i[ok], tracos[ok]] += amp * decai[ok] * peso[ok]
-
+        adiciona_difracao(dif, x0, t0, vel)
         apices.append((x0, t0))
 
     return dif, apices
 
-if __name__ == "__main__":
-    refl, topo, base = modelo_refletividade(ns, ntr, nrefl=nrefl)
-    dif, apices = modelo_difracoes(refl, ndif, vel)
+def sintetiza_secoes(refl, dif, dt=dt):
+    """Convolve reflexoes e difracoes com wavelets distintas e soma ruido ao campo total
+
+    Retorna (secao_refl, secao_dif, secao_total, secao_total_ruidosa).
+    """
+    ns = refl.shape[0]
 
     # reflexoes: ricker com frequencias mais baixas
     _, ricker_refl = pulso_ricker(rng.uniform(10, 40), dt, ns)
@@ -79,6 +87,13 @@ if __name__ == "__main__":
     # campo de onda completo (reflexoes + difracoes) com ruido gaussiano
     secao_total = secao_refl + secao_dif
     secao_total_ruidosa = adiciona_ruido_snr(secao_total, snr_db=rng.uniform(5, 20), rng=rng)
+
+    return secao_refl, secao_dif, secao_total, secao_total_ruidosa
+
+if __name__ == "__main__":
+    refl, topo, base = modelo_refletividade(ns, ntr, nrefl=nrefl)
+    dif, apices = modelo_difracoes(refl, ndif, vel)
+    secao_refl, secao_dif, secao_total, secao_total_ruidosa = sintetiza_secoes(refl, dif)
 
     # exporta secoes em SU (little-endian)
     salva_su(secao_refl, dt, "su/difracoes/secao_2d_reflexoes.su")

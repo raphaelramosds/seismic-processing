@@ -1,0 +1,12 @@
+{
+    "nmodelos": 100,
+    "nrefl": 5,
+    "ndif": 3,
+    "npatches": 4,
+    "saida": "su/dataset",
+    "ns": 256,
+    "ntr": 256,
+    "dt": 0.006,
+    "sem_ruido": false,
+    "seed": 42
+}

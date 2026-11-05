@@ -26,8 +26,15 @@ def tendencia_senoidal(ntr: int, t_medio: float, amp_max: float):
     fase = rng.uniform(0, 2 * np.pi)
     return t_medio + amp * np.sin(2 * np.pi * x / comp + fase)
 
-def modelo_refletividade(ns, ntr, nrefl):
-    """Preenche a secao com refletores que seguem duas tendencias senoidais"""
+def sorteia_u(nrefl):
+    """Sorteia os tempos relativos u (ordenados) dos refletores entre topo e base"""
+    return np.sort(rng.uniform(-0.1, 1.1, nrefl))
+
+def modelo_refletividade(ns, ntr, nrefl, u=None):
+    """Preenche a secao com refletores que seguem duas tendencias senoidais
+
+    u (opcional): tempos relativos dos refletores; se omitido, e sorteado.
+    """
     # coordenadas relativas ao grid do topo e base dos pontos nas tendencias senoidais
     topo = tendencia_senoidal(ntr, rng.uniform(t1, t2) * ns, 0.1 * ns)
     base = tendencia_senoidal(ntr, rng.uniform(b1, b2) * ns, 0.1 * ns)
@@ -36,7 +43,8 @@ def modelo_refletividade(ns, ntr, nrefl):
     # u = 0 (refletor exatamente no topo)
     # u = 1 (exatamente na base)
     # u < 0 (acima do topo) e u > 1 (acima da base)
-    u = np.sort(rng.uniform(-0.1, 1.1, nrefl))
+    if u is None:
+        u = sorteia_u(nrefl)
 
     # amplitude dos refletores (nrefl, )
     amps = rng.uniform(-1, 1, nrefl)
